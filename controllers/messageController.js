@@ -1,6 +1,7 @@
 import Conversation from "../models/Conversation.js";
 import Message from "../models/Message.js";
 import { getReceiverSocketId, io } from "../middlewares/socket.js";
+import User from "../models/User.js";
 
 export const sendMessage = async (req, res) => {
 	try {
@@ -23,7 +24,14 @@ export const sendMessage = async (req, res) => {
 			receiverId,
 			message,
 		});
-
+		const user = await User.findById(senderId)
+		if (!user.ChatList.find(receiverId)) {
+			await User.findByIdAndUpdate(senderId, {
+				$push: {
+					ChatList: receiverId
+				}
+			})
+		}
 		if (newMessage) {
 			conversation.messages.push(newMessage._id);
 		}

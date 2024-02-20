@@ -80,4 +80,24 @@ export const getWishList=async(req,res)=>{
     const doctors=user.wishlist.find()
     res.status(200).json(doctors)
 }
+export const searchPatient=async(req,res)=>{
+    const user=await User.findById(req.body.id)
+    res.status(200).json(user)
+}
 
+export const getSpecializationDoctor = async (req, res) => {
+    const { specialization } = req.query
+    let doctor
+    
+    if (specialization) {
+        doctor = await Doctor.find({ specialization: specialization })
+            .sort({ totalRating })
+            .populate("user", ["-password"])
+    }
+    else {
+        doctor = await Doctor.find()
+            .sort({ totalRating })
+            .populate("user", ["-password"])
+    }
+    res.status(200).json(doctor)
+}

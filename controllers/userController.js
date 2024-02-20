@@ -121,7 +121,7 @@ export const UserBeDoctor = asyncHandler(async (req, res) => {
 })
 
 export const makeBlock = async (req, res) => {
-    const user = await User.findByIdAndUpdate((req.params.id||req.body.id), {
+    const user = await User.findByIdAndUpdate(req.body.id, {
         $set: {
             isBlocked: true
         }

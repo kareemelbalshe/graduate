@@ -48,7 +48,7 @@ export const getAllHistory = async (req, res) => {
 }
 
 export const getSingleHistory = async (req, res) => {
-    const history = await History.findById(req.params.id)
+    const history = await History.findById(req.params.historyId)
         .populate("user", ["-password"])
     if (!history) {
         return res.status(404).json({ message: 'history not found' })
@@ -64,13 +64,13 @@ export const getHistoryCount = async (req, res) => {
 }
 
 export const deleteHistory = async (req, res) => {
-    const history = await History.findById(req.params.id)
+    const history = await History.findById(req.params.historyId)
     if (!history) {
         return res.status(404).json({ message: 'history not found' })
     }
     
     if (req.user.role==='admin' || req.user.id === history.user.toString()) {
-        await History.findByIdAndDelete(req.params.id)
+        await History.findByIdAndDelete(req.params.historyId)
         await cloudinaryRemoveImage(history.image.publicId)
 
         res.status(200).json({ message: "history has been deleted successfully", historyId: history._id })
@@ -82,7 +82,7 @@ export const deleteHistory = async (req, res) => {
 
 export const updateHistory = async (req, res) => {
 
-    const history = await History.findById(req.params.id)
+    const history = await History.findById(req.params.historyId)
     if (!history) {
         return res.status(404).json({ message: 'history not found' })
     }
@@ -91,7 +91,7 @@ export const updateHistory = async (req, res) => {
         return res.status(403).json({ message: 'access denied,you are not allowed' })
     }
 
-    const updateHistory = await History.findByIdAndUpdate(req.params.id, {
+    const updateHistory = await History.findByIdAndUpdate(req.params.historyId, {
         $set: {
             description: req.body.description,
             category: req.body.category,
@@ -107,7 +107,7 @@ export const updateHistoryPhoto = async (req, res) => {
         return res.status(400).json({ message: error.details[0].message })
     }
 
-    const history = await History.findById(req.params.id)
+    const history = await History.findById(req.params.historyId)
     if (!history) {
         return res.status(404).json({ message: 'history not found' })
     }
@@ -121,7 +121,7 @@ export const updateHistoryPhoto = async (req, res) => {
     const imagePath = path.join(__dirname, `../images/${req.file.filename}`)
     const result = await cloudinaryUploadImage(imagePath)
 
-    const updateHistory = await History.findByIdAndUpdate(req.params.id, {
+    const updateHistory = await History.findByIdAndUpdate(req.params.historyId, {
         $set: {
             image: {
                 url: result.secure_url,

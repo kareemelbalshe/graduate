@@ -7,8 +7,6 @@ import authRoute from './routes/authRoute.js'
 import userRoute from './routes/userRoute.js'
 import messageRoute from './routes/messageRoute.js'
 import passwordRoute from './routes/passwordRoute.js'
-import reviewRoute from './routes/reviewRoute.js'
-import historyRoute from './routes/historyRoute.js'
 import passport from "passport"
 import { app, server } from "./middlewares/socket.js"
 import TextFlow from "textflow.js"
@@ -42,8 +40,6 @@ app.use("/api/auth", authRoute)
 app.use("/api/users", userRoute)
 app.use("/api/message", messageRoute)
 app.use("/api/password", passwordRoute)
-app.use("/api/reviews", reviewRoute)
-app.use("/api/history", historyRoute)
 
 
 app.use(notFound)
