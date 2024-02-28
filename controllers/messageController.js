@@ -2,8 +2,10 @@ import Conversation from "../models/Conversation.js";
 import Message from "../models/Message.js";
 import { getReceiverSocketId, io } from "../middlewares/socket.js";
 import User from "../models/User.js";
+import asyncHandler from "express-async-handler"
 
-export const sendMessage = async (req, res) => {
+
+export const sendMessage = asyncHandler(async (req, res) => {
 	try {
 		const { message } = req.body;
 		const { id: receiverId } = req.params;
@@ -54,9 +56,9 @@ export const sendMessage = async (req, res) => {
 		console.log("Error in sendMessage controller: ", error.message);
 		res.status(500).json({ error: "Internal server error" });
 	}
-};
+});
 
-export const getMessages = async (req, res) => {
+export const getMessages = asyncHandler(async (req, res) => {
 	try {
 		const { id: userToChatId } = req.params;
 		const senderId = req.user._id;
@@ -74,4 +76,4 @@ export const getMessages = async (req, res) => {
 		console.log("Error in getMessages controller: ", error.message);
 		res.status(500).json({ error: "Internal server error" });
 	}
-};
+});

@@ -23,7 +23,7 @@ export const sendResetPasswordLinkCtrl = asyncHandler(async (req, res) => {
         await verificationToken.save()
     }
 
-    const link = `http://localhost:3000/reset-password/${user._id}/${verificationToken.token}`
+    const link = `http://localhost:58217/reset-password/${user._id}/${verificationToken.token}`
     const htmlTemplate = `
     <a href="${link}">Click here to reset your password</a>
     `

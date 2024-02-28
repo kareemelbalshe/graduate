@@ -10,6 +10,7 @@ import { cloudinaryRemoveImage, cloudinaryRemoveMultipleImage, cloudinaryUploadI
 import Doctor from "../models/Doctor.js";
 import Review from "../models/Review.js";
 import History from "../models/History.js";
+import Report from "../models/report.js"
 
 
 export const getAllUsersCtrl = asyncHandler(async (req, res) => {
@@ -18,7 +19,7 @@ export const getAllUsersCtrl = asyncHandler(async (req, res) => {
 })
 
 export const getUserProfileCtrl = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.params.id).select("-password").populate("reviews doctors history")
+    const user = await User.findById(req.params.id).select("-password").populate("reviews").populate("history").populate("doctors")
     if (!user) {
         return res.status(404).json({ message: "user not found" })
     }
@@ -120,16 +121,16 @@ export const UserBeDoctor = asyncHandler(async (req, res) => {
     res.status(201).json(doctor)
 })
 
-export const makeBlock = async (req, res) => {
+export const makeBlock = asyncHandler(async (req, res) => {
     const user = await User.findByIdAndUpdate(req.body.id, {
         $set: {
             isBlocked: true
         }
     })
     res.status(201).json(user)
-}
+})
 
-export const sendSMSPhone = async (req, res) => {
+export const sendSMSPhone = asyncHandler(async (req, res) => {
     const phone = req.body.phone
 
     var result = await textflow.sendVerificationSMS(phone);
@@ -139,8 +140,9 @@ export const sendSMSPhone = async (req, res) => {
 
     return res.status(400).json({ success: false });
 
-}
-export const setPhone = async (req, res) => {
+})
+
+export const setPhone = asyncHandler(async (req, res) => {
     const phone = req.body.phone
 
     var result = await textflow.verifyCode(phone, req.body.code);
@@ -155,4 +157,12 @@ export const setPhone = async (req, res) => {
         }
     })
     res.status(201).json(user)
-}
+})
+
+export const createReport=asyncHandler(async(req,res)=>{
+    const report=await Report.create({
+        user:req.user._id,
+        description:req.body.description,
+        about:req.params.id,
+    })
+})

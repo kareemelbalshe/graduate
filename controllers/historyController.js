@@ -5,9 +5,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import fs from "fs"
 import History from "../models/History.js"
 import { cloudinaryRemoveImage, cloudinaryUploadImage } from "../utils/cloudinary.js"
+import asyncHandler from "express-async-handler"
 
 
-export const createHistory = async (req, res) => {
+export const createHistory = asyncHandler(async (req, res) => {
     if (!req.file) {
         return res.status(400).json({ message: "no image provided" })
     }
@@ -28,26 +29,26 @@ export const createHistory = async (req, res) => {
     res.status(201).json(history)
 
     fs.unlinkSync(imagePath)
-}
+})
 
-export const getAllHistory = async (req, res) => {
+export const getAllHistory = asyncHandler(async (req, res) => {
     const { category } = req.query
     let history
     
     if (category) {
         history = await History.find({ category: category })
-            .sort({ createdAt: -1 })
+            .sort({ date: -1 })
             .populate("user", ["-password"])
     }
     else {
         history = await History.find()
-            .sort({ createdAt: -1 })
+            .sort({ date: -1 })
             .populate("user", ["-password"])
     }
     res.status(200).json(history)
-}
+})
 
-export const getSingleHistory = async (req, res) => {
+export const getSingleHistory = asyncHandler( async (req, res) => {
     const history = await History.findById(req.params.historyId)
         .populate("user", ["-password"])
     if (!history) {
@@ -55,15 +56,15 @@ export const getSingleHistory = async (req, res) => {
     }
 
     res.status(200).json(history)
-}
+})
 
-export const getHistoryCount = async (req, res) => {
+export const getHistoryCount = asyncHandler(async (req, res) => {
     const count = await History.count()
 
     res.status(200).json(count)
-}
+})
 
-export const deleteHistory = async (req, res) => {
+export const deleteHistory = asyncHandler(async (req, res) => {
     const history = await History.findById(req.params.historyId)
     if (!history) {
         return res.status(404).json({ message: 'history not found' })
@@ -78,9 +79,9 @@ export const deleteHistory = async (req, res) => {
     else {
         res.status(403).json({ message: "access denied, forbidden" })
     }
-}
+})
 
-export const updateHistory = async (req, res) => {
+export const updateHistory = asyncHandler(async (req, res) => {
 
     const history = await History.findById(req.params.historyId)
     if (!history) {
@@ -100,9 +101,9 @@ export const updateHistory = async (req, res) => {
     }, { new: true }).populate("user", ["-password"])
 
     res.status(200).json(updateHistory)
-}
+})
 
-export const updateHistoryPhoto = async (req, res) => {
+export const updateHistoryPhoto = asyncHandler(async (req, res) => {
     if (!req.file) {
         return res.status(400).json({ message: error.details[0].message })
     }
@@ -132,4 +133,4 @@ export const updateHistoryPhoto = async (req, res) => {
 
     res.status(200).json(updateHistory)
     fs.unlinkSync(imagePath)
-}
+})

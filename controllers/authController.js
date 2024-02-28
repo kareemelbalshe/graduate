@@ -2,7 +2,7 @@ import asyncHandler from "express-async-handler"
 import bcrypt from 'bcryptjs'
 import User, { validateRegisterUser, validateLoginUser } from "../models/User.js"
 import VerificationToken from "../models/VerificationToken.js"
-// import sendEmail from '../utils/sendEmail.js'
+import sendEmail from '../utils/sendEmail.js'
 import crypto from 'crypto'
 /** ------------------------
 *@desc Register New User
@@ -35,7 +35,7 @@ export const registerUserCtrl = asyncHandler(async (req, res) => {
         token: crypto.randomBytes(32).toString("hex")
     })
     await verificationToken.save()
-    const link = `http://localhost:3000/users/${user._id}/verify/${verificationToken.token}`
+    const link = `http://localhost:58217/users/${user._id}/verify/${verificationToken.token}`
     const htmlTemplate = `
     <div>
         <p>Click on the link below to verify your email</p>
@@ -75,7 +75,7 @@ export const loginUserCtrl = asyncHandler(async (req, res) => {
             })
             await verificationToken.save()
         }
-        const link = `http://localhost:3000/users/${user._id}/verify/${verificationToken.token}`
+        const link = `http://localhost:58217/users/${user._id}/verify/${verificationToken.token}`
         const htmlTemplate = `
     <div>
         <p>Click on the link below to verify your email</p>
@@ -90,6 +90,7 @@ export const loginUserCtrl = asyncHandler(async (req, res) => {
         return res.status(500).json({ message: "Email is Blocked" })
     }
     const token = user.generateAuthToken()
+    
     res.status(200).json({
         _id: user._id,
         role:user.role,
@@ -113,7 +114,7 @@ export const verifyUserAccountCtrl = asyncHandler(async (req, res) => {
     }
     user.isAccountVerified = true
     await user.save()
-    await verificationToken.remove()
+    await verificationToken.deleteOne({userId:req.params.userId})
 
     return res.status(200).json({ message: "Your account verified" })
 })

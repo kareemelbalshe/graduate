@@ -7,7 +7,7 @@ import authRoute from './routes/authRoute.js'
 import userRoute from './routes/userRoute.js'
 import messageRoute from './routes/messageRoute.js'
 import passwordRoute from './routes/passwordRoute.js'
-import passport from "passport"
+// import passport from "passport"
 import { app, server } from "./middlewares/socket.js"
 import TextFlow from "textflow.js"
 import xss from 'xss-clean'
@@ -33,8 +33,8 @@ app.use(rateLimiting({
 
 TextFlow.useKey(process.env.TEXTFLOW_API_KEY)
 
-app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.initialize());
+// app.use(passport.session());
 
 app.use("/api/auth", authRoute)
 app.use("/api/users", userRoute)

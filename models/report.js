@@ -1,7 +1,6 @@
 import { Schema, model } from 'mongoose';
 
-
-const History = new Schema({
+const Report = new Schema({
     description: {
         type: String,
         required: true,
@@ -14,25 +13,9 @@ const History = new Schema({
         ref: "User",
         required: true,
     },
-    doctor: {
+    about:{
         type: Schema.Types.ObjectId,
-        ref: "Doctor",
-    },
-    date:{
-        type:Date,
-        required:true
-    },
-    category: {
-        type: String,
         required: true,
-        enum: ["t7alel", "rojeta","ashe3a"],
-    },
-    image: {
-        type: Object,
-        default: {
-            url: "",
-            publicId: null,
-        }
     },
 }, {
     timestamps: true,
@@ -40,4 +23,4 @@ const History = new Schema({
     toObject: { virtuals: true }
 })
 
-export default model('History', History)
+export default model('Report', Report)

@@ -2,8 +2,10 @@ import Stripe from 'stripe'
 import Doctor from '../models/Doctor.js'
 import User from '../models/User.js'
 import Booking from '../models/Booking.js'
+import asyncHandler from "express-async-handler"
 
-export const getCheckoutSession=async(req,res)=>{
+
+export const getCheckoutSession=asyncHandler(async(req,res)=>{
     try {
         const doctor=await Doctor.findOne({user:req.params.id})
         const user =await User.findById(req.user.id)
@@ -13,8 +15,8 @@ export const getCheckoutSession=async(req,res)=>{
         const session=await stripe.checkout.sessions.create({
             payment_method_types:['card'],
             mode:'payment',
-            success_url:'http://localhost:3000/checkout-success',
-            cancel_url:`${req.protocol}://${req.get('host')}/doctors/${doctor.id}`,
+            success_url:'http://localhost:58217/checkout-success',
+            cancel_url:`${req.protocol}://${req.get('host')}/doctors/${doctor._id}`,
             customer_email:user.email,
             client_reference_id:req.params.doctorId,
             line_items:[
@@ -42,8 +44,9 @@ export const getCheckoutSession=async(req,res)=>{
     } catch (error) {
         res.status(500).json({success:false,message:'Error creating checkout session',session})
     }
-}
-export const getAllBooking=async(req,res)=>{
-    const booking=await Booking.find()
+})
+
+export const getAllBooking=asyncHandler(async(req,res)=>{
+    const booking=await Booking.find().populate("user").populate("doctor")
     res.status(200).json({success:true,booking})
-}
+})

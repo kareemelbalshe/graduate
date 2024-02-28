@@ -1,27 +1,53 @@
 import Doctor from "../models/Doctor.js"
 import Review from "../models/Review.js"
-import User from "../models/User.js"
+import asyncHandler from "express-async-handler"
 
-export const getAllReviews=async(req,res)=>{
+
+export const getAllReviews=asyncHandler(async(req,res)=>{
     try {
-        const reviews=await Review.find()
+        const reviews=await Review.find().populate("user")
         res.status(200).json({success:true,message:"successful",data:reviews})
     } catch (error) {
         res.status(404).json({success:false,message:"Not found"})
     }
-}
+})
 
-export const createReview=async(req,res)=>{
+export const createReview=asyncHandler(async(req,res)=>{
 
-    const newReview=new Review(req.body)
+    const newReview=new Review({
+        user:req.user.id,
+        doctor:req.params.id,
+        rating:req.body.rating,
+        reviewText:req.body.reviewText
+    })
     const savedReview=await newReview.save()
-    const user=await User.findById(req.body.user)
-        await Doctor.findOneAndUpdate({user:user._id},{
+        await Doctor.findOneAndUpdate({user:req.params.id},{
             $push:{reviews:savedReview._id}})
     res.status(200).json({success:true,message:"Review submitted",data:newReview})
-}
+})
 
-export const deleteReview=async(req,res)=>{
+export const updateReviewCtrl = asyncHandler(async (req, res) => {
+
+    const review = await Review.findById(req.body.reviewId)
+    if (!review) {
+        return res.status(404).json({ message: "review not found" })
+    }
+
+    if (req.user.id !== review.user.toString()) {
+        return res.status(403).json({ message: "access denied, only user himself can edit his review" })
+    }
+
+    const updateReview = await Review.findByIdAndUpdate(req.body.reviewId, {
+        $set: {
+            rating:req.body.rating,
+            reviewText:req.body.reviewText
+        }
+    }, { new: true })
+
+    res.status(201).json(updateReview)
+})
+
+export const deleteReview=asyncHandler(async(req,res)=>{
     await Review.findOneAndRemove(req.body.reviewId)
     res.status(200).json({success:true,message:"Review deleted"})
-}
+})

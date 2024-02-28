@@ -1,5 +1,6 @@
 import { Schema, model } from 'mongoose';
 import Joi from 'joi';
+import jwt from 'jsonwebtoken';
 import passwordComplexity from 'joi-password-complexity';
 
 const User = new Schema({

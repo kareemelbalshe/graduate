@@ -26,6 +26,9 @@ const Booking = new Schema(
       type: Boolean,
       default: true,
     },
+    session:{
+      type:String
+    }
   },
   { timestamps: true }
 );

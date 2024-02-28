@@ -4,7 +4,7 @@ import { verifyDoctor, verifyToken, verifyTokenAndAdmin, verifyTokenAndAuthoriza
 import validateObject from "../middlewares/validateObject.js";
 import { photoUpload } from "../middlewares/photoUpload.js";
 import { isBlock } from "../middlewares/isBlock.js";
-import { getAllDoctors, getLikeList, getWishList, toggleLikeCtrl, updateDoctor } from "../controllers/doctorController.js";
+import { getChatList, getAllDoctors, getLikeList, getWishList, toggleLikeCtrl, updateDoctor } from "../controllers/doctorController.js";
 import { createHistory, deleteHistory, getAllHistory, getHistoryCount, getSingleHistory, updateHistory, updateHistoryPhoto } from "../controllers/historyController.js";
 import { getCheckoutSession } from "../controllers/bookingController.js";
 import { createReview, deleteReview, getAllReviews } from "../controllers/reviewController.js";
@@ -21,12 +21,13 @@ router.route("/profile/:id")
     .get(validateObject,isBlock, getUserProfileCtrl)
     .put(validateObject,isBlock, verifyTokenAndOnlyUser, updateUserProfileCtrl)
     .delete(validateObject,isBlock, verifyTokenAndAuthorization, deleteUserProfileCtrl)
-    .post(validateObject,verifyToken,updateDoctor)
+    .put(validateObject,verifyToken,updateDoctor)
 
 router.post('/profile/:id/booking',validateObject,verifyToken,getCheckoutSession)
 
 router.route("/profile/:id/like-list").get(validateObject, getLikeList)
 router.route("/profile/:id/wish-list").get(validateObject, getWishList)
+router.route("/profile/chat-list").get(validateObject, getChatList)
 
 router.route("/profile/:id/review")
     .post(validateObject,isBlock,verifyToken,createReview)
