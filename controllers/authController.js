@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs'
 import User, { validateRegisterUser, validateLoginUser } from "../models/User.js"
 import VerificationToken from "../models/VerificationToken.js"
 import sendEmail from '../utils/sendEmail.js'
-import crypto from 'crypto'
+// import crypto from 'crypto'
 /** ------------------------
 *@desc Register New User
 *@router /api/auth/register
@@ -29,22 +29,29 @@ export const registerUserCtrl = asyncHandler(async (req, res) => {
         password: hashPassword
     })
     await user.save()
+    
+        var charset = "0123456789";
+        var code = "";
+        for (var i = 0; i < 6; i++) {
+            var randomIndex = Math.floor(Math.random() * charset.length);
+            code += charset[randomIndex];
+        }
 
     const verificationToken = new VerificationToken({
         userId: user._id,
-        token: crypto.randomBytes(32).toString("hex")
+        token: code
     })
     await verificationToken.save()
-    const link = `http://localhost:58217/users/${user._id}/verify/${verificationToken.token}`
     const htmlTemplate = `
     <div>
-        <p>Click on the link below to verify your email</p>
-        <a href="${link}">Verify</a>
-    </div>
-    `
+        <p>Your code is</p>
+        <h1>${verificationToken.token}</h1>
+        <p>Greetings from the work team</p>
+        <h2>DOC on call</h2>
+    </div>`
     await sendEmail(user.email, "Verify your Email", htmlTemplate)
 
-    res.status(201).json({ message: "We send to you an email, please verify your email address" })
+    res.status(201).json({ message: "We send to you an email, please verify your email address",_id:user._id })
 })
 /** ------------------------
 *@desc login New User
@@ -69,17 +76,26 @@ export const loginUserCtrl = asyncHandler(async (req, res) => {
     if (!user.isAccountVerified) {
         let verificationToken = await VerificationToken.findOne({ userId: user._id })
         if (!verificationToken) {
+            
+                var charset = "0123456789";
+                var code = "";
+                for (var i = 0; i < 6; i++) {
+                    var randomIndex = Math.floor(Math.random() * charset.length);
+                    code += charset[randomIndex];
+                }
+                
             verificationToken = new VerificationToken({
                 userId: user._id,
-                token: crypto.randomBytes(32).toString("hex")
+                token: code
             })
             await verificationToken.save()
         }
-        const link = `http://localhost:58217/users/${user._id}/verify/${verificationToken.token}`
         const htmlTemplate = `
     <div>
-        <p>Click on the link below to verify your email</p>
-        <a href="${link}">Verify</a>
+        <p>Your code is</p>
+        <h1>${verificationToken.token}</h1>
+        <p>Greetings from the work team</p>
+        <h2>DOC on call</h2>
     </div>
     `
         await sendEmail(user.email, "Verify your Email", htmlTemplate)
@@ -103,14 +119,14 @@ export const loginUserCtrl = asyncHandler(async (req, res) => {
 export const verifyUserAccountCtrl = asyncHandler(async (req, res) => {
     const user = await User.findById(req.params.userId)
     if (!user) {
-        return res.status(400).json({ message: "invalid link" })
+        return res.status(400).json({ message: "invalid user" })
     }
     const verificationToken = await VerificationToken.findOne({
         userId: user._id,
-        token: req.params.token
+        token: req.body.code
     })
     if (!verificationToken) {
-        return res.status(400).json({ message: "invalid link" })
+        return res.status(400).json({ message: "invalid code" })
     }
     user.isAccountVerified = true
     await user.save()

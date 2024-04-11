@@ -6,9 +6,11 @@ import fs from "fs"
 import History from "../models/History.js"
 import { cloudinaryRemoveImage, cloudinaryUploadImage } from "../utils/cloudinary.js"
 import asyncHandler from "express-async-handler"
+import User from '../models/User.js';
 
 
 export const createHistory = asyncHandler(async (req, res) => {
+    const doctor=await User.findOne({_id:req.user.id,role:"doctor"})
     if (!req.file) {
         return res.status(400).json({ message: "no image provided" })
     }
@@ -19,7 +21,8 @@ export const createHistory = asyncHandler(async (req, res) => {
     const history = await History.create({
         description: req.body.description,
         category: req.body.category,
-        user: req.user.id,
+        doctor:doctor,
+        user: req.params.id,
         date:req.body.date,
         image: {
             url: result.secure_url,

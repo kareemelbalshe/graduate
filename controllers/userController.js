@@ -19,7 +19,7 @@ export const getAllUsersCtrl = asyncHandler(async (req, res) => {
 })
 
 export const getUserProfileCtrl = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.params.id).select("-password").populate("reviews").populate("history").populate("doctors")
+    const user = await User.findById(req.params.id).select("-password").populate("reviews").populate("history").populate("doctors booking")
     if (!user) {
         return res.status(404).json({ message: "user not found" })
     }
@@ -112,13 +112,21 @@ export const deleteUserProfileCtrl = asyncHandler(async (req, res) => {
 })
 
 export const UserBeDoctor = asyncHandler(async (req, res) => {
-    await User.findByIdAndUpdate(req.params.id, {
+    const user=await User.findByIdAndUpdate(req.params.id, {
         $set: {
             role: 'doctor'
         }
     })
+    const token = user.generateAuthToken()
     const doctor = await Doctor.create({ user: req.params.id })
-    res.status(201).json(doctor)
+    res.status(200).json({
+        _id: user._id,
+        role:user.role,
+        photo: user.photo,
+        token,
+        username: user.username,
+        doctor
+    })
 })
 
 export const makeBlock = asyncHandler(async (req, res) => {
@@ -164,5 +172,24 @@ export const createReport=asyncHandler(async(req,res)=>{
         user:req.user._id,
         description:req.body.description,
         about:req.params.id,
+        kind:req.query.kind
     })
+    res.status(200).json(report)
 })
+export const getAllReports=asyncHandler(async(req,res)=>{
+    const report=await Report.find()
+    
+    res.status(200).json(report)
+})
+
+export const deleteReport=asyncHandler(async(req,res)=>{
+    const report=await Report.findByIdAndDelete(req.params.id)
+    
+    res.status(200).json({message:"report deleted"})
+})
+// setInterval(async()=>{
+//         const report=await Report.find()
+//         report.map(r=>{
+//             Date.now()-Date(r.createdAt)>
+//         })
+//     },1000*60*60*24)

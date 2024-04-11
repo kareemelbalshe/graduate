@@ -14,15 +14,14 @@ passport.use(
 			let user = await User.findOne({ googleId: profile.id });
 
 			if (!user) {
-				const password = () => {
+				
 					var charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+";
 					var password = "";
 					for (var i = 0; i < 10; i++) {
 						var randomIndex = Math.floor(Math.random() * charset.length);
 						password += charset[randomIndex];
 					}
-					return password;
-				}
+					
 				const salt = await bcrypt.genSalt(10)
 				const hashPassword = await bcrypt.hash(password, salt)
 				user = new User({

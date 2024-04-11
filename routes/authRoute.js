@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { registerUserCtrl, loginUserCtrl, verifyUserAccountCtrl } from "../controllers/authController.js";
+import { isBlock } from "../middlewares/isBlock.js";
 // import passport from "passport";
 
 const router = new Router()
@@ -8,7 +9,7 @@ router.post("/register", registerUserCtrl)
 
 router.post("/login", loginUserCtrl)
 
-router.get("/:userId/verify/:token", verifyUserAccountCtrl)
+router.get("/verify/:userId", verifyUserAccountCtrl)
 
 // router.get("/login/success", (req, res) => {
 // 	if (req.user) {

@@ -48,6 +48,6 @@ export const updateReviewCtrl = asyncHandler(async (req, res) => {
 })
 
 export const deleteReview=asyncHandler(async(req,res)=>{
-    await Review.findOneAndRemove(req.body.reviewId)
+    await Review.findOneAndRemove(req.params.reviewId)
     res.status(200).json({success:true,message:"Review deleted"})
 })

@@ -3,9 +3,9 @@ import bcrypt from 'bcryptjs'
 import User, { validateEmail, validateNewPassword } from "../models/User.js"
 import VerificationTokenSchema from "../models/VerificationToken.js"
 import sendEmail from '../utils/sendEmail.js'
-import crypto from 'crypto'
+// import crypto from 'crypto'
 
-export const sendResetPasswordLinkCtrl = asyncHandler(async (req, res) => {
+export const sendResetPasswordCtrl = asyncHandler(async (req, res) => {
     const { error } = validateEmail(req.body)
     if (error) {
         return res.status(400).json({ message: error.details[0].message })
@@ -16,16 +16,27 @@ export const sendResetPasswordLinkCtrl = asyncHandler(async (req, res) => {
     }
     let verificationToken = await VerificationTokenSchema.findOne({ userId: user._id })
     if (!verificationToken) {
+        var charset = "0123456789";
+                var code = "";
+                for (var i = 0; i < 6; i++) {
+                    var randomIndex = Math.floor(Math.random() * charset.length);
+                    code += charset[randomIndex];
+                }
         verificationToken = new VerificationTokenSchema({
             userId: user._id,
-            token: crypto.randomBytes(32).toString("hex")
+            token: code
         })
         await verificationToken.save()
     }
 
-    const link = `http://localhost:58217/reset-password/${user._id}/${verificationToken.token}`
+    // const link = `http://localhost:58217/reset-password/${user._id}/${verificationToken.token}`
     const htmlTemplate = `
-    <a href="${link}">Click here to reset your password</a>
+    <div>
+        <p>Your code to reset your password</p>
+        <h1>${verificationToken.token}</h1>
+        <p>Greetings from the work team</p>
+        <h2>DOC on call</h2>
+    </div>
     `
     await sendEmail(user.email, "Reset Password", htmlTemplate)
     res.status(200).json({ message: "Password reset link your email,Please check your email" })
@@ -38,7 +49,7 @@ export const getResetPasswordLinkCtrl = asyncHandler(async (req, res) => {
     }
     const verificationToken = await VerificationTokenSchema.findOne({
         userId: user._id,
-        token: req.params.token
+        token: req.body.code
     })
     if (!verificationToken) {
         return res.status(400).json({ message: "invalid link" })
@@ -57,7 +68,7 @@ export const resetPasswordCtrl = asyncHandler(async (req, res) => {
     }
     const verificationToken = await VerificationTokenSchema.findOne({
         userId: user._id,
-        token: req.params.token
+        token: req.body.code
     })
     if (!verificationToken) {
         return res.status(400).json({ message: "invalid link" })
@@ -69,6 +80,6 @@ export const resetPasswordCtrl = asyncHandler(async (req, res) => {
     const hashedPassword = await bcrypt.hash(req.body.password, salt)
     user.password = hashedPassword
     await user.save()
-    await verificationToken.remove()
+    await verificationToken.deleteOne({userId:req.params.userId})
     res.status(200).json({ message: "Password reset successfully, please log in" })
 })

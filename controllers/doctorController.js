@@ -4,7 +4,7 @@ import asyncHandler from "express-async-handler"
 
 
 export const getAllDoctors = asyncHandler(async (req, res) => {
-    const doctors = await User.find({ role: 'doctor' }).select("-password")
+    const doctors = await User.find({ role: 'doctor' }).populate("doctor").select("-password")
     res.status(200).json(doctors)
 })
 
@@ -73,7 +73,7 @@ export const getLikeList = asyncHandler(async (req, res) => {
     const doctor = await Doctor.findOne({ user: req.params.id })
 
     const users = doctor.likes
-    const likeList=await User.findById({_id: { $in: users }}).select("-password")
+    const likeList = await User.findById({ _id: { $in: users } }).select("-password")
 
     res.status(200).json(likeList)
 })
@@ -81,24 +81,35 @@ export const getLikeList = asyncHandler(async (req, res) => {
 export const getWishList = asyncHandler(async (req, res) => {
     const user = await User.findById(req.params.id)
     const doctors = user.wishlist
-    const wishList=await User.findById({_id: { $in: doctors }}).select("-password")
+    const wishList = await User.findById({ _id: { $in: doctors } }).select("-password")
     res.status(200).json(wishList)
 })
 
 export const getChatList = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user.id)
     const chat = user.ChatList
-    const ChatList=await User.findById({_id: { $in: chat }}).select("-password")
+    const ChatList = await User.findById({ _id: { $in: chat } }).select("-password")
     res.status(200).json(ChatList)
 })
 
-export const searchPatient = asyncHandler(async (req, res) => {
+
+export const searchDoctor = asyncHandler(async (req, res) => {
     const doctor = await User.find({
-        role: { $eq: "doctor" }, username: {
-            $regex: req.query.keyword,
-            $options: "i",
-        }
+        role: { $eq: "patient" }, _id: req.body.id
     })
+    res.status(200).json(doctor)
+})
+
+export const popularDoctor = asyncHandler(async (req, res) => {
+    const doctor = await User.find({
+        role: { $eq: "doctor" },
+    }).sort({ totalRating: -1 }).limit(10)
+    res.status(200).json(doctor)
+})
+export const newDoctor = asyncHandler(async (req, res) => {
+    const doctor = await User.find({
+        role: { $eq: "doctor" },
+    }).sort({ createdAt: -1 }).limit(10)
     res.status(200).json(doctor)
 })
 
@@ -108,19 +119,25 @@ export const getDoctor = asyncHandler(async (req, res) => {
     let doctor
 
     if (specialization && degree) {
-        doctor = await Doctor.find({ specialization: specialization, degree: degree })
+        doctor = await Doctor.find({
+            specialization: specialization, degree: degree, $lte: { ticketPrice: req?.body.price }, role: { $eq: "doctor" }, username: {
+                $regex: req.body.keyword,
+                $options: "i",
+            }
+        })
             .sort({ totalRating: -1 })
             .populate("user", ["-password"])
     }
     else if (specialization) {
-        doctor = await Doctor.find({ specialization: specialization })
+        doctor = await Doctor.find({
+            specialization: specialization, $lte: { ticketPrice: req?.body.price }, role: { $eq: "doctor" }, username: {
+                $regex: req.body.keyword,
+                $options: "i",
+            }
+        })
             .sort({ totalRating: -1 })
             .populate("user", ["-password"])
     }
-    else {
-        doctor = await Doctor.find({ $lte: { ticketPrice: req?.body.price } })
-            .sort({ totalRating: -1 })
-            .populate("user", ["-password"])
-    }
+    
     res.status(200).json(doctor)
 })

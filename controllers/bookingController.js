@@ -25,8 +25,8 @@ export const getCheckoutSession=asyncHandler(async(req,res)=>{
                         currency:'bdt',
                         unit_amount:doctor.ticketPrice*100,
                         product_data:{
-                            name:doctor.name,
-                            images:[doctor.photo]
+                            name:doctor.user.username,
+                            images:[doctor.user.photo]
                         }
                     },
                     quantity:1
@@ -34,7 +34,7 @@ export const getCheckoutSession=asyncHandler(async(req,res)=>{
             ]
         })
         const booking=new Booking({
-            doctor:doctor._id,
+            doctor:doctor.user._id,
             user:user._id,
             ticketPrice:doctor.ticketPrice,
             session:session.id

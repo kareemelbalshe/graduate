@@ -17,6 +17,11 @@ const Report = new Schema({
         type: Schema.Types.ObjectId,
         required: true,
     },
+    kind:{
+        type:String,
+        enum: ["User","Message","Review","History"],
+        required: true,
+    }
 }, {
     timestamps: true,
     toJSON: { virtuals: true },

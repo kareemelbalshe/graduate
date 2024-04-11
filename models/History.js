@@ -16,7 +16,8 @@ const History = new Schema({
     },
     doctor: {
         type: Schema.Types.ObjectId,
-        ref: "Doctor",
+        ref: "User",
+        default:"Not at app"
     },
     date:{
         type:Date,
