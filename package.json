@@ -1,8 +1,8 @@
 {
-  "name": "blog-backend",
+  "name": "DOC_on_Call",
   "type": "module",
   "version": "1.0.0",
-  "description": "backend to blog app",
+  "description": "backend to DOC app",
   "main": "app.js",
   "scripts": {
     "dev": "nodemon index.js",

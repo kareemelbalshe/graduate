@@ -19,7 +19,7 @@ const Report = new Schema({
     },
     kind:{
         type:String,
-        enum: ["User","Message","Review","History"],
+        enum: ["user","message","review","history"],
         required: true,
     }
 }, {

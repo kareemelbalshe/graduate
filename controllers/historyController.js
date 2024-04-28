@@ -10,7 +10,7 @@ import User from '../models/User.js';
 
 
 export const createHistory = asyncHandler(async (req, res) => {
-    const doctor=await User.findOne({_id:req.user.id,role:"doctor"})
+    const doctor = await User.findOne({ _id: req.user.id, role: "doctor" })
     if (!req.file) {
         return res.status(400).json({ message: "no image provided" })
     }
@@ -21,9 +21,9 @@ export const createHistory = asyncHandler(async (req, res) => {
     const history = await History.create({
         description: req.body.description,
         category: req.body.category,
-        doctor:doctor,
+        date: req.body.date,
+        doctor: doctor._id,
         user: req.params.id,
-        date:req.body.date,
         image: {
             url: result.secure_url,
             publicId: result.public_id
@@ -35,25 +35,33 @@ export const createHistory = asyncHandler(async (req, res) => {
 })
 
 export const getAllHistory = asyncHandler(async (req, res) => {
-    const { category } = req.query
+    const { category } = req.body
     let history
-    
+
     if (category) {
         history = await History.find({ category: category })
-            .sort({ date: -1 })
-            .populate("user", ["-password"])
+            .sort({ createdAt: -1 })
+            .populate("user", "-password -wishlist -ChatList -Reservations")
+            .populate("doctor", "-likes -reviews")
     }
     else {
         history = await History.find()
             .sort({ date: -1 })
-            .populate("user", ["-password"])
+            .populate("user", "-password -wishlist -ChatList -Reservations")
+            .populate("doctor", "-likes -reviews")
     }
     res.status(200).json(history)
 })
 
-export const getSingleHistory = asyncHandler( async (req, res) => {
+export const getUserHistory=asyncHandler(async (req, res) => {
+    const history=await History.find({user:req.user.id})
+    res.status(200).json(history)
+})
+
+export const getSingleHistory = asyncHandler(async (req, res) => {
     const history = await History.findById(req.params.historyId)
-        .populate("user", ["-password"])
+        .populate("user", "-password -wishlist -ChatList -Reservations")
+        .populate("doctor", "-likes -reviews")
     if (!history) {
         return res.status(404).json({ message: 'history not found' })
     }
@@ -61,19 +69,19 @@ export const getSingleHistory = asyncHandler( async (req, res) => {
     res.status(200).json(history)
 })
 
-export const getHistoryCount = asyncHandler(async (req, res) => {
-    const count = await History.count()
+// export const getHistoryCount = asyncHandler(async (req, res) => {
+//     const count = await History.count()
 
-    res.status(200).json(count)
-})
+//     res.status(200).json(count)
+// })
 
 export const deleteHistory = asyncHandler(async (req, res) => {
     const history = await History.findById(req.params.historyId)
     if (!history) {
         return res.status(404).json({ message: 'history not found' })
     }
-    
-    if (req.user.role==='admin' || req.user.id === history.user.toString()) {
+
+    if (req.user.role === 'admin' || req.user.id === history.user.toString()) {
         await History.findByIdAndDelete(req.params.historyId)
         await cloudinaryRemoveImage(history.image.publicId)
 
@@ -99,9 +107,9 @@ export const updateHistory = asyncHandler(async (req, res) => {
         $set: {
             description: req.body.description,
             category: req.body.category,
-            date:req.body.date
+            date: req.body.date
         }
-    }, { new: true }).populate("user", ["-password"])
+    }, { new: true }).populate("user", "-password -wishlist -ChatList -Reservations").populate("doctor", "-likes -reviews")
 
     res.status(200).json(updateHistory)
 })

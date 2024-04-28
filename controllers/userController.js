@@ -1,8 +1,7 @@
 import asyncHandler from "express-async-handler"
-import User, { validateUpdateUser } from "../models/User.js"
+import User from "../models/User.js"
 import bcrypt from 'bcryptjs'
 import path from 'path'
-import textflow from "textflow.js"
 import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import fs from "fs"
@@ -11,15 +10,16 @@ import Doctor from "../models/Doctor.js";
 import Review from "../models/Review.js";
 import History from "../models/History.js";
 import Report from "../models/report.js"
+import Message from "../models/Message.js";
 
 
 export const getAllUsersCtrl = asyncHandler(async (req, res) => {
-    const users = await User.find({role:'patient'}).select("-password")
+    const users = await User.find({ role: 'patient' }).select("-password -wishlist -ChatList -Reservations")
     res.status(200).json(users)
 })
 
 export const getUserProfileCtrl = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.params.id).select("-password").populate("reviews").populate("history").populate("doctors booking")
+    const user = await User.findById(req.params.id).select("-password -wishlist -ChatList -Reservations").populate("history").populate("doctors")
     if (!user) {
         return res.status(404).json({ message: "user not found" })
     }
@@ -27,10 +27,10 @@ export const getUserProfileCtrl = asyncHandler(async (req, res) => {
 })
 
 export const updateUserProfileCtrl = asyncHandler(async (req, res) => {
-    const { error } = validateUpdateUser(req.body)
-    if (error) {
-        return res.status(400).json({ message: error.details[0].message })
-    }
+    // const { error } = validateUpdateUser(req.body)
+    // if (error) {
+    //     return res.status(400).json({ message: error.details[0].message })
+    // }
     if (req.body.password) {
         const salt = await bcrypt.genSalt(10)
         req.body.password = await bcrypt.hash(req.body.password, salt)
@@ -42,15 +42,16 @@ export const updateUserProfileCtrl = asyncHandler(async (req, res) => {
             address: req.body.address,
             gender: req.body.gender,
             bloodType: req.body.bloodType,
+            phone: req.body.phone,
         }
-    }, { new: true }).select("-password").populate("reviews doctors history")
+    }, { new: true }).select("-password -wishlist -ChatList -Reservations").populate("history").populate("doctors")
     res.status(200).json(updateUser)
 })
 
-export const getUsersCountCtrl = asyncHandler(async (req, res) => {
-    const count = await User.count()
-    res.status(200).json(count)
-})
+// export const getUsersCountCtrl = asyncHandler(async (req, res) => {
+//     const count = await User.count()
+//     res.status(200).json(count)
+// })
 
 export const profilePhotoUploadCtrl = asyncHandler(async (req, res) => {
     if (!req.file) {
@@ -112,7 +113,7 @@ export const deleteUserProfileCtrl = asyncHandler(async (req, res) => {
 })
 
 export const UserBeDoctor = asyncHandler(async (req, res) => {
-    const user=await User.findByIdAndUpdate(req.params.id, {
+    const user = await User.findByIdAndUpdate(req.params.id, {
         $set: {
             role: 'doctor'
         }
@@ -121,7 +122,7 @@ export const UserBeDoctor = asyncHandler(async (req, res) => {
     const doctor = await Doctor.create({ user: req.params.id })
     res.status(200).json({
         _id: user._id,
-        role:user.role,
+        role: user.role,
         photo: user.photo,
         token,
         username: user.username,
@@ -138,54 +139,47 @@ export const makeBlock = asyncHandler(async (req, res) => {
     res.status(201).json(user)
 })
 
-export const sendSMSPhone = asyncHandler(async (req, res) => {
-    const phone = req.body.phone
-
-    var result = await textflow.sendVerificationSMS(phone);
-
-    if (result.ok) //send sms here
-        return res.status(200).json({ success: true });
-
-    return res.status(400).json({ success: false });
-
+export const createReport = asyncHandler(async (req, res) => {
+    const report = await Report.create({
+        user: req.user.id,
+        description: req.body.description,
+        about: req.params.id,
+        kind: req.query.kind
+    })
+    res.status(200).json(report)
 })
 
-export const setPhone = asyncHandler(async (req, res) => {
-    const phone = req.body.phone
+export const getAllReports = asyncHandler(async (req, res) => {
+    const report = await Report.find();
+    let resp = [];
 
-    var result = await textflow.verifyCode(phone, req.body.code);
+    await Promise.all(report.map(async (v) => {
+        let kind = v.kind;
+        let response;
 
-    if (!result.valid) {
-        return res.status(400).json({ success: false });
-    }
-
-    const user = await User.findByIdAndUpdate(req.params.id, {
-        $set: {
-            phone: phone
+        if (kind === "user") {
+            response = await User.findById(v.about).populate("-password -wishlist -ChatList -Reservations");
+        } else if (kind === "message") {
+            response = await Message.findById(v.about).populate("senderId", "-password -wishlist -ChatList -Reservations").populate("receiverId", "-password -wishlist -ChatList -Reservations");;
+        } else if (kind === "history") {
+            response = await History.findById(v.about).populate("user", "-password -wishlist -ChatList -Reservations")
+            .populate("doctor", "-likes -reviews");
+        } else if (kind === "review") {
+            response = await Review.findById(v.about).populate("user", "-password -wishlist -ChatList -Reservations")
+            .populate("doctor", "-likes -reviews");
         }
-    })
-    res.status(201).json(user)
-})
 
-export const createReport=asyncHandler(async(req,res)=>{
-    const report=await Report.create({
-        user:req.user._id,
-        description:req.body.description,
-        about:req.params.id,
-        kind:req.query.kind
-    })
-    res.status(200).json(report)
-})
-export const getAllReports=asyncHandler(async(req,res)=>{
-    const report=await Report.find()
-    
-    res.status(200).json(report)
-})
+        resp.push({ response, description: v.description });
+    }));
 
-export const deleteReport=asyncHandler(async(req,res)=>{
-    const report=await Report.findByIdAndDelete(req.params.id)
-    
-    res.status(200).json({message:"report deleted"})
+    res.status(200).json({ data: resp });
+});
+
+
+export const deleteReport = asyncHandler(async (req, res) => {
+    const report = await Report.findByIdAndDelete(req.params.id)
+
+    res.status(200).json({ message: "report deleted" })
 })
 // setInterval(async()=>{
 //         const report=await Report.find()

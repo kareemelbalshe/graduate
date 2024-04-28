@@ -4,12 +4,12 @@ import asyncHandler from "express-async-handler"
 
 
 export const getAllDoctors = asyncHandler(async (req, res) => {
-    const doctors = await User.find({ role: 'doctor' }).populate("doctor").select("-password")
+    const doctors = await User.find({ role: 'doctor' }).populate("doctors").select("-password")
     res.status(200).json(doctors)
 })
 
 export const updateDoctor = asyncHandler(async (req, res) => {
-    const doctor = await Doctor.findOneAndUpdate({ user: req.params.id }, {
+    await Doctor.findOneAndUpdate({ user: req.params.id }, {
         $set: {
             specialization: req.body.specialization,
             bio: req.body.bio,
@@ -18,11 +18,12 @@ export const updateDoctor = asyncHandler(async (req, res) => {
             experiences: req.body.experiences,
             hospital: req.body.hospital
         },
-        $push: {
-            timeSlots: req.body.timeSlots
-        }
     })
-    res.status(201).json({ message: "Doctor is updated", doctor })
+    const user = await User.findById(req.params.id).select("-password -wishlist -ChatList -Reservations").populate("doctors", "-likes")
+    if (!user) {
+        return res.status(404).json({ message: "user not found" })
+    }
+    res.status(201).json({ message: "Doctor is updated", user })
 })
 
 export const toggleLikeCtrl = asyncHandler(async (req, res) => {
@@ -37,9 +38,6 @@ export const toggleLikeCtrl = asyncHandler(async (req, res) => {
     const isDoctorAlreadyLiked = doctor.likes.find((user) => user.toString() === loginUser)
     if (isDoctorAlreadyLiked) {
         await Doctor.findOneAndUpdate({ user: req.params.id }, {
-            $set: {
-                isLike: false
-            },
             $pull: {
                 likes: loginUser
             }
@@ -53,9 +51,6 @@ export const toggleLikeCtrl = asyncHandler(async (req, res) => {
     }
     else {
         await Doctor.findOneAndUpdate({ user: req.params.id }, {
-            $set: {
-                isLike: true
-            },
             $push: {
                 likes: loginUser
             }
@@ -73,7 +68,7 @@ export const getLikeList = asyncHandler(async (req, res) => {
     const doctor = await Doctor.findOne({ user: req.params.id })
 
     const users = doctor.likes
-    const likeList = await User.findById({ _id: { $in: users } }).select("-password")
+    const likeList = await User.find({ _id: { $in: users } }).select("-password").select("-wishlist").select("-ChatList")
 
     res.status(200).json(likeList)
 })
@@ -81,63 +76,114 @@ export const getLikeList = asyncHandler(async (req, res) => {
 export const getWishList = asyncHandler(async (req, res) => {
     const user = await User.findById(req.params.id)
     const doctors = user.wishlist
-    const wishList = await User.findById({ _id: { $in: doctors } }).select("-password")
+    const wishList = await User.find({ _id: { $in: doctors } }).select("-password").select("-likes").select("-ChatList")
     res.status(200).json(wishList)
 })
 
 export const getChatList = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user.id)
     const chat = user.ChatList
-    const ChatList = await User.findById({ _id: { $in: chat } }).select("-password")
+    const ChatList = await User.find({ _id: { $in: chat } }).select("-password").select("-likes").select("-wishlist")
     res.status(200).json(ChatList)
 })
 
 
-export const searchDoctor = asyncHandler(async (req, res) => {
-    const doctor = await User.find({
-        role: { $eq: "patient" }, _id: req.body.id
-    })
+export const searchAboutPatient = asyncHandler(async (req, res) => {
+    let patient
+    const username = req.body.username,
+        id = req.body.id
+    if (username) {
+        patient = await User.find({
+            role: "patient",
+            username: {
+                $regex: username,
+                $options: "i",
+            }
+        }).select("-password -wishlist -ChatList -Reservations").populate("doctors", "-likes -reviews")
+    }
+    else if (id) {
+        patient = await User.find({
+            role: "patient", _id: req?.body.id,
+        }).select("-password -wishlist -ChatList -Reservations").populate("doctors", "-likes -reviews")
+    }
+    res.status(200).json(patient)
+})
+
+export const searchAboutDoctor = asyncHandler(async (req, res) => {
+    let doctor
+    const username = req.body.username,
+        id = req.body.id
+    if (username) {
+        doctor = await User.find({
+            role: "doctor",
+            username: {
+                $regex: username,
+                $options: "i",
+            }
+        }).select("-password -wishlist -ChatList -Reservations").populate("doctors", "-likes -reviews")
+    }
+    else if (id) {
+        doctor = await User.find({
+            role: "doctor", _id: req?.body.id,
+        }).select("-password -wishlist -ChatList -Reservations").populate("doctors", "-likes -reviews")
+    }
     res.status(200).json(doctor)
 })
 
 export const popularDoctor = asyncHandler(async (req, res) => {
-    const doctor = await User.find({
-        role: { $eq: "doctor" },
-    }).sort({ totalRating: -1 }).limit(10)
+    const doctor = await Doctor.find().select("-reviews").populate("user", "-password -wishlist -ChatList -Reservations").sort({ totalRating: -1, averageRating: -1, likes: -1 }).limit(20)
     res.status(200).json(doctor)
 })
+
 export const newDoctor = asyncHandler(async (req, res) => {
-    const doctor = await User.find({
-        role: { $eq: "doctor" },
-    }).sort({ createdAt: -1 }).limit(10)
+    const doctor = await Doctor.find().select("-likes -reviews").populate("user", "-password -wishlist -ChatList -Reservations").sort({ createdAt: -1 }).limit(20)
     res.status(200).json(doctor)
 })
 
 export const getDoctor = asyncHandler(async (req, res) => {
-    const { specialization, degree } = req.query
+    const { specialization, degree, ticketPrice } = req.query
+    const username = req.body.username
 
     let doctor
 
-    if (specialization && degree) {
-        doctor = await Doctor.find({
-            specialization: specialization, degree: degree, $lte: { ticketPrice: req?.body.price }, role: { $eq: "doctor" }, username: {
-                $regex: req.body.keyword,
+    if (specialization && degree && ticketPrice && username) {
+        const d = await User.find({
+            username: {
+                $regex: username,
                 $options: "i",
             }
         })
-            .sort({ totalRating: -1 })
-            .populate("user", ["-password"])
+        const id = d.map((u) => {
+            return u._id
+        })
+        doctor = await Doctor.find({
+            specialization: specialization, degree: degree, ticketPrice: { $lte: ticketPrice }, user: { _id: id }
+        })
+            .sort({ totalRating: -1, averageRating: -1, likes: -1 })
+            .populate("user", "-password -wishlist -ChatList -Reservations").populate("-reviews")
+    }
+    else if (specialization && degree && ticketPrice) {
+        doctor = await Doctor.find({
+            specialization: specialization, degree: degree, ticketPrice: { $lte: ticketPrice }
+        })
+            .sort({ totalRating: -1, averageRating: -1, likes: -1 })
+            .populate("user", "-password -wishlist -ChatList -Reservations").populate("-reviews")
+    }
+    else if (specialization && degree) {
+        doctor = await Doctor.find({
+            specialization: specialization, degree: degree,
+        })
+            .sort({ totalRating: -1, averageRating: -1, likes: -1 })
+            .populate("user", "-password -wishlist -ChatList -Reservations").populate("-reviews")
     }
     else if (specialization) {
         doctor = await Doctor.find({
-            specialization: specialization, $lte: { ticketPrice: req?.body.price }, role: { $eq: "doctor" }, username: {
-                $regex: req.body.keyword,
-                $options: "i",
-            }
+            specialization: specialization,
         })
-            .sort({ totalRating: -1 })
-            .populate("user", ["-password"])
+            .sort({ totalRating: -1, averageRating: -1, likes: -1 })
+            .populate("user", "-password -wishlist -ChatList -Reservations").populate("-reviews")
     }
-    
+
+
     res.status(200).json(doctor)
 })

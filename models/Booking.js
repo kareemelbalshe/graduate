@@ -29,8 +29,10 @@ const Booking = new Schema(
     session:{
       type:String
     }
-  },
-  { timestamps: true }
-);
+  }, {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+});
 
 export default model("Booking", Booking);

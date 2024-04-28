@@ -26,16 +26,18 @@ export const registerUserCtrl = asyncHandler(async (req, res) => {
     user = new User({
         username: req.body.username,
         email: req.body.email,
-        password: hashPassword
+        password: hashPassword,
+        birthday: req.body.birthday,
+        gender: req.body.gender
     })
     await user.save()
-    
-        var charset = "0123456789";
-        var code = "";
-        for (var i = 0; i < 6; i++) {
-            var randomIndex = Math.floor(Math.random() * charset.length);
-            code += charset[randomIndex];
-        }
+
+    var charset = "0123456789";
+    var code = "";
+    for (var i = 0; i < 6; i++) {
+        var randomIndex = Math.floor(Math.random() * charset.length);
+        code += charset[randomIndex];
+    }
 
     const verificationToken = new VerificationToken({
         userId: user._id,
@@ -51,7 +53,7 @@ export const registerUserCtrl = asyncHandler(async (req, res) => {
     </div>`
     await sendEmail(user.email, "Verify your Email", htmlTemplate)
 
-    res.status(201).json({ message: "We send to you an email, please verify your email address",_id:user._id })
+    res.status(201).json({ message: "We send to you an email, please verify your email address", id: user._id })
 })
 /** ------------------------
 *@desc login New User
@@ -76,14 +78,14 @@ export const loginUserCtrl = asyncHandler(async (req, res) => {
     if (!user.isAccountVerified) {
         let verificationToken = await VerificationToken.findOne({ userId: user._id })
         if (!verificationToken) {
-            
-                var charset = "0123456789";
-                var code = "";
-                for (var i = 0; i < 6; i++) {
-                    var randomIndex = Math.floor(Math.random() * charset.length);
-                    code += charset[randomIndex];
-                }
-                
+
+            var charset = "0123456789";
+            var code = "";
+            for (var i = 0; i < 6; i++) {
+                var randomIndex = Math.floor(Math.random() * charset.length);
+                code += charset[randomIndex];
+            }
+
             verificationToken = new VerificationToken({
                 userId: user._id,
                 token: code
@@ -102,14 +104,14 @@ export const loginUserCtrl = asyncHandler(async (req, res) => {
 
         res.status(400).json({ message: "We send to you an email, please verify your email address" })
     }
-    if(user.isBlocked===true){
+    if (user.isBlocked === true) {
         return res.status(500).json({ message: "Email is Blocked" })
     }
     const token = user.generateAuthToken()
-    
+
     res.status(200).json({
         _id: user._id,
-        role:user.role,
+        role: user.role,
         photo: user.photo,
         token,
         username: user.username
@@ -130,7 +132,7 @@ export const verifyUserAccountCtrl = asyncHandler(async (req, res) => {
     }
     user.isAccountVerified = true
     await user.save()
-    await verificationToken.deleteOne({userId:req.params.userId})
+    await verificationToken.deleteOne({ userId: req.params.userId })
 
     return res.status(200).json({ message: "Your account verified" })
 })

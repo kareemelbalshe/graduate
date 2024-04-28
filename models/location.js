@@ -4,8 +4,12 @@ const LocationSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     latitude: Number,
     longitude: Number,
-    timestamp: { type: Date, default: Date.now }
-  });
+    timeSlots: [{type:Object,day:{type:String},from:{type:String},to:{type:String}}],
+  }, {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+});
 
 const Location = mongoose.model('Location', LocationSchema);
 export default Location

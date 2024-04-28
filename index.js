@@ -9,14 +9,13 @@ import messageRoute from './routes/messageRoute.js'
 import passwordRoute from './routes/passwordRoute.js'
 // import passport from "passport"
 import { app, server } from "./middlewares/socket.js"
-import TextFlow from "textflow.js"
 import xss from 'xss-clean'
 import hpp from "hpp"
 import helmet from "helmet"
 dotenv.config()
 
 
-
+//B4B9SYC3E2GQESTQ2F3KJWB8
 app.use(express.json())
 
 app.use(helmet())
@@ -29,9 +28,6 @@ app.use(rateLimiting({
     windowMs: 10 * 60 * 1000,
     max: 200
 }))
-
-
-TextFlow.useKey(process.env.TEXTFLOW_API_KEY)
 
 // app.use(passport.initialize());
 // app.use(passport.session());

@@ -46,10 +46,6 @@ const Doctor = new Schema({
             ref: "User"
         }
     ],
-    isLike:{
-        type:Boolean
-    },
-    
 
     experiences: {
         type: String,
@@ -66,7 +62,6 @@ const Doctor = new Schema({
     //     formattedAddress: String}
     // ],
     bio: { type: String, maxLength: 200 },
-    timeSlots: [{type:Object,day:{type:String},from:{type:Date},to:{type:Date}}],
     reviews: [{ type: Schema.Types.ObjectId, ref: "Review" }],
     averageRating: {
         type: Number,
@@ -76,7 +71,12 @@ const Doctor = new Schema({
         type: Number,
         default: 0,
     },
+}, {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
 });
+
 
 // Doctor.pre('save', async function(next) {
 //     const loc = await geocoder.geocode(this.address);

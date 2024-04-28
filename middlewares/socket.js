@@ -18,7 +18,7 @@ const userSocketMap = {}; // {userId: socketId}
 io.on("connection", (socket) => {
 	console.log("a user connected", socket.id);
 
-	const userId = socket.handshake.query.userId;
+	const userId = socket.handshake.user.id;
 	if (userId != "undefined") userSocketMap[userId] = socket.id;
 
 	// io.emit() is used to send events to all the connected clients

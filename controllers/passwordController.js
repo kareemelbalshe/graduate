@@ -17,11 +17,11 @@ export const sendResetPasswordCtrl = asyncHandler(async (req, res) => {
     let verificationToken = await VerificationTokenSchema.findOne({ userId: user._id })
     if (!verificationToken) {
         var charset = "0123456789";
-                var code = "";
-                for (var i = 0; i < 6; i++) {
-                    var randomIndex = Math.floor(Math.random() * charset.length);
-                    code += charset[randomIndex];
-                }
+        var code = "";
+        for (var i = 0; i < 6; i++) {
+            var randomIndex = Math.floor(Math.random() * charset.length);
+            code += charset[randomIndex];
+        }
         verificationToken = new VerificationTokenSchema({
             userId: user._id,
             token: code
@@ -39,22 +39,7 @@ export const sendResetPasswordCtrl = asyncHandler(async (req, res) => {
     </div>
     `
     await sendEmail(user.email, "Reset Password", htmlTemplate)
-    res.status(200).json({ message: "Password reset link your email,Please check your email" })
-})
-
-export const getResetPasswordLinkCtrl = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.params.userId)
-    if (!user) {
-        return res.status(400).json({ message: "invalid link" })
-    }
-    const verificationToken = await VerificationTokenSchema.findOne({
-        userId: user._id,
-        token: req.body.code
-    })
-    if (!verificationToken) {
-        return res.status(400).json({ message: "invalid link" })
-    }
-    res.status(200).json({ message: "Valid url" })
+    res.status(200).json({ message: "OTP sent,Please check your email", userId: user._id })
 })
 
 export const resetPasswordCtrl = asyncHandler(async (req, res) => {
@@ -64,22 +49,24 @@ export const resetPasswordCtrl = asyncHandler(async (req, res) => {
     }
     const user = await User.findById(req.params.userId)
     if (!user) {
-        return res.status(404).json({ message: "invalid link" })
+        return res.status(404).json({ message: "user not found" })
     }
     const verificationToken = await VerificationTokenSchema.findOne({
         userId: user._id,
         token: req.body.code
     })
     if (!verificationToken) {
-        return res.status(400).json({ message: "invalid link" })
+        return res.status(400).json({ message: "invalid otp" })
     }
     if (!user.isAccountVerified) {
         user.isAccountVerified = true
     }
-    const salt = await bcrypt.genSalt(10)
-    const hashedPassword = await bcrypt.hash(req.body.password, salt)
-    user.password = hashedPassword
-    await user.save()
-    await verificationToken.deleteOne({userId:req.params.userId})
+    if (req.body.password === req.body.confirmPassword) {
+        const salt = await bcrypt.genSalt(10)
+        const hashedPassword = await bcrypt.hash(req.body.password, salt)
+        user.password = hashedPassword
+        await user.save()
+        await verificationToken.deleteOne({ userId: req.params.userId })
+    }
     res.status(200).json({ message: "Password reset successfully, please log in" })
 })

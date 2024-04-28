@@ -9,7 +9,7 @@ export const sendMessage = asyncHandler(async (req, res) => {
 	try {
 		const { message } = req.body;
 		const { id: receiverId } = req.params;
-		const senderId = req.user._id;
+		const senderId = req.user.id;
 
 		let conversation = await Conversation.findOne({
 			participants: { $all: [senderId, receiverId] },
@@ -19,6 +19,16 @@ export const sendMessage = asyncHandler(async (req, res) => {
 			conversation = await Conversation.create({
 				participants: [senderId, receiverId],
 			});
+			await User.findByIdAndUpdate(senderId, {
+				$push: {
+					ChatList: receiverId
+				}
+			})
+			await User.findByIdAndUpdate(receiverId, {
+				$push: {
+					ChatList: senderId
+				}
+			})
 		}
 
 		const newMessage = new Message({
@@ -26,14 +36,6 @@ export const sendMessage = asyncHandler(async (req, res) => {
 			receiverId,
 			message,
 		});
-		const user = await User.findById(senderId)
-		if (!user.ChatList.find(receiverId)) {
-			await User.findByIdAndUpdate(senderId, {
-				$push: {
-					ChatList: receiverId
-				}
-			})
-		}
 		if (newMessage) {
 			conversation.messages.push(newMessage._id);
 		}
@@ -61,7 +63,7 @@ export const sendMessage = asyncHandler(async (req, res) => {
 export const getMessages = asyncHandler(async (req, res) => {
 	try {
 		const { id: userToChatId } = req.params;
-		const senderId = req.user._id;
+		const senderId = req.user.id;
 
 		const conversation = await Conversation.findOne({
 			participants: { $all: [senderId, userToChatId] },
@@ -77,3 +79,9 @@ export const getMessages = asyncHandler(async (req, res) => {
 		res.status(500).json({ error: "Internal server error" });
 	}
 });
+
+export const deleteMessage = asyncHandler(async (req, res) => {
+	const { id } = req.params;
+	await Message.findByIdAndDelete(id)
+	res.status(200).json({ message: "message is deleted" });
+})
