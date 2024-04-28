@@ -56,7 +56,7 @@ router.route("/profile/:id/review")
     .post(validateObject, verifyToken, isBlock, createReview)
     .put(validateObject, verifyToken, isBlock, updateReviewCtrl)
     .delete(validateObject, verifyTokenAndAuthorization, deleteReview)
-// router.route("/profile/:id/review/:reviewId")
+
 
 
 router.route('/profile/:id/location')

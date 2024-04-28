@@ -14,8 +14,8 @@ export const getAllReviews = asyncHandler(async (req, res) => {
     }
 })
 
-export const getDoctorReviews=asyncHandler(async (req, res) => {
-    const reviews = await Review.find({doctor:req.user.id}).populate("user", "-password -wishlist -ChatList -Reservations")
+export const getDoctorReviews = asyncHandler(async (req, res) => {
+    const reviews = await Review.find({ doctor: req.user.id }).populate("user", "-password -wishlist -ChatList -Reservations")
     res.status(200).json({ success: true, message: "successful", data: reviews })
 })
 

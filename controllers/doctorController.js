@@ -160,28 +160,28 @@ export const getDoctor = asyncHandler(async (req, res) => {
             specialization: specialization, degree: degree, ticketPrice: { $lte: ticketPrice }, user: { _id: id }
         })
             .sort({ totalRating: -1, averageRating: -1, likes: -1 })
-            .populate("user", "-password -wishlist -ChatList -Reservations").populate("-reviews")
+            .populate("user", "-password -wishlist -ChatList -Reservations").select("-reviews")
     }
     else if (specialization && degree && ticketPrice) {
         doctor = await Doctor.find({
             specialization: specialization, degree: degree, ticketPrice: { $lte: ticketPrice }
         })
             .sort({ totalRating: -1, averageRating: -1, likes: -1 })
-            .populate("user", "-password -wishlist -ChatList -Reservations").populate("-reviews")
+            .populate("user", "-password -wishlist -ChatList -Reservations").select("-reviews")
     }
     else if (specialization && degree) {
         doctor = await Doctor.find({
             specialization: specialization, degree: degree,
         })
             .sort({ totalRating: -1, averageRating: -1, likes: -1 })
-            .populate("user", "-password -wishlist -ChatList -Reservations").populate("-reviews")
+            .populate("user", "-password -wishlist -ChatList -Reservations").select("-reviews")
     }
     else if (specialization) {
         doctor = await Doctor.find({
             specialization: specialization,
         })
             .sort({ totalRating: -1, averageRating: -1, likes: -1 })
-            .populate("user", "-password -wishlist -ChatList -Reservations").populate("-reviews")
+            .populate("user", "-password -wishlist -ChatList -Reservations").select("-reviews")
     }
 
 

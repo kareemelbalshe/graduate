@@ -53,8 +53,8 @@ export const getAllHistory = asyncHandler(async (req, res) => {
     res.status(200).json(history)
 })
 
-export const getUserHistory=asyncHandler(async (req, res) => {
-    const history=await History.find({user:req.user.id})
+export const getUserHistory = asyncHandler(async (req, res) => {
+    const history = await History.find({ user: req.user.id })
     res.status(200).json(history)
 })
 

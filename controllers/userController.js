@@ -160,13 +160,14 @@ export const getAllReports = asyncHandler(async (req, res) => {
         if (kind === "user") {
             response = await User.findById(v.about).populate("-password -wishlist -ChatList -Reservations");
         } else if (kind === "message") {
-            response = await Message.findById(v.about).populate("senderId", "-password -wishlist -ChatList -Reservations").populate("receiverId", "-password -wishlist -ChatList -Reservations");;
+            response = await Message.findById(v.about).populate("senderId", "-password -wishlist -ChatList -Reservations")
+                .populate("receiverId", "-password -wishlist -ChatList -Reservations");
         } else if (kind === "history") {
             response = await History.findById(v.about).populate("user", "-password -wishlist -ChatList -Reservations")
-            .populate("doctor", "-likes -reviews");
+                .populate("doctor", "-likes -reviews");
         } else if (kind === "review") {
             response = await Review.findById(v.about).populate("user", "-password -wishlist -ChatList -Reservations")
-            .populate("doctor", "-likes -reviews");
+                .populate("doctor", "-likes -reviews");
         }
 
         resp.push({ response, description: v.description });
