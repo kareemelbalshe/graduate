@@ -4,7 +4,7 @@ const Booking = new Schema(
   {
     doctor: {
       type: Schema.Types.ObjectId,
-      ref: "Doctor",
+      ref: "User",
       required: true,
     },
     user: {
@@ -12,23 +12,12 @@ const Booking = new Schema(
       ref: "User",
       required: true,
     },
-    ticketPrice: { type: String, required: true },
-    appointmentDate: {
-      type: Date,
-      required: true,
-    },
+    ticketPrice: { type: Number, required: true },
     status: {
       type: String,
       enum: ["pending", "approved", "cancelled"],
       default: "pending",
     },
-    isPaid: {
-      type: Boolean,
-      default: true,
-    },
-    session:{
-      type:String
-    }
   }, {
     timestamps: true,
     toJSON: { virtuals: true },

@@ -1,6 +1,7 @@
 import Doctor from "../models/Doctor.js"
 import Review from "../models/Review.js"
 import asyncHandler from "express-async-handler"
+import User from "../models/User.js"
 
 
 export const getAllReviews = asyncHandler(async (req, res) => {
@@ -21,26 +22,32 @@ export const getDoctorReviews = asyncHandler(async (req, res) => {
 
 export const createReview = asyncHandler(async (req, res) => {
     const id = req.params.id
-    const newReview = new Review({
-        user: req.user.id,
-        doctor: id,
-        rating: req.body.rating,
-        reviewText: req.body.reviewText
-    })
-    const savedReview = await newReview.save()
-    const stats = await Review.find({ doctor: id })
-    let avg = 0
-    stats.map((v) => {
-        avg += v.rating
-    })
+    const reviews = await Review.find({ doctor:id,user:req.user.id })
+    if (!reviews) {
+        const newReview = new Review({
+            user: req.user.id,
+            doctor: id,
+            rating: req.body.rating,
+            reviewText: req.body.reviewText
+        })
+        const savedReview = await newReview.save()
+        const stats = await Review.find({ doctor: id })
+        let avg = 0
+        stats.map((v) => {
+            avg += v.rating
+        })
 
-    avg /= stats.length
-    await Doctor.findOneAndUpdate({ user: id }, {
-        $push: { reviews: savedReview._id },
-        totalRating: stats.length,
-        averageRating: avg
-    })
-    res.status(200).json({ success: true, message: "Review submitted", data: newReview })
+        avg /= stats.length
+        await Doctor.findOneAndUpdate({ user: id }, {
+            $push: { reviews: savedReview._id },
+            totalRating: stats.length,
+            averageRating: avg
+        })
+        res.status(200).json({ success: true, message: "Review submitted", data: newReview })
+    }
+    else {
+        res.status(500).json({ success: false, message: "you already reviewed" })
+    }
 })
 
 export const updateReviewCtrl = asyncHandler(async (req, res) => {

@@ -81,6 +81,12 @@ User.virtual("reviews", {
     localField: "_id"
 })
 
+User.virtual("booking", {
+    ref: "Booking",
+    foreignField: "doctor",
+    localField: "_id"
+})
+
 User.virtual("history", {
     ref: "History",
     foreignField: "user",

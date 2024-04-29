@@ -18,7 +18,11 @@ const messageSchema = new mongoose.Schema(
 		},
 		// createdAt, updatedAt
 	},
-	{ timestamps: true }
+	{
+		timestamps: true,
+		toJSON: { virtuals: true },
+		toObject: { virtuals: true }
+	}
 );
 
 const Message = mongoose.model("Message", messageSchema);

@@ -31,11 +31,12 @@ export const sendResetPasswordCtrl = asyncHandler(async (req, res) => {
 
     // const link = `http://localhost:58217/reset-password/${user._id}/${verificationToken.token}`
     const htmlTemplate = `
-    <div>
-        <p>Your code to reset your password</p>
-        <h1>${verificationToken.token}</h1>
-        <p>Greetings from the work team</p>
-        <h2>DOC on call</h2>
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 10% auto;padding: 20px; border: 1px solid gray;background-color: lavender; color: blueviolet;border-radius: 10px; width: 80%;">
+        <h3 style="text-align: center; margin: 10px auto;padding: 0;">Your activation code is</h3>
+        <h1 style="text-align: center; margin: 25px auto;padding: 10px 20px; background-color: blueviolet; color: white; border-radius: 12px;">${verificationToken.token}</h1>
+        <h3 style="text-align: center; margin: 10px auto;padding: 0;">Greetings from the work team</h3>
+        <h2 style="text-align: center; margin: 10px auto;padding: 0;">DOC on call</h2>
+        <h5 style="text-align: center; margin: 10px auto;padding: 0;">All Rights reserved DOC on call</h5>
     </div>
     `
     await sendEmail(user.email, "Reset Password", htmlTemplate)
@@ -68,7 +69,7 @@ export const resetPasswordCtrl = asyncHandler(async (req, res) => {
         await user.save()
         await verificationToken.deleteOne({ userId: req.params.userId })
     }
-    else{
+    else {
         res.status(500).json({ message: "password and confirm not match" })
     }
     res.status(200).json({ message: "Password reset successfully, please log in" })

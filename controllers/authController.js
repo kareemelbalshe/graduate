@@ -45,11 +45,12 @@ export const registerUserCtrl = asyncHandler(async (req, res) => {
     })
     await verificationToken.save()
     const htmlTemplate = `
-    <div>
-        <p>Your code is</p>
-        <h1>${verificationToken.token}</h1>
-        <p>Greetings from the work team</p>
-        <h2>DOC on call</h2>
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 10% auto;padding: 20px; border: 1px solid gray;background-color: lavender; color: blueviolet;border-radius: 10px; width: 80%;">
+        <h3 style="text-align: center; margin: 10px auto;padding: 0;">Your activation code is</h3>
+        <h1 style="text-align: center; margin: 25px auto;padding: 10px 20px; background-color: blueviolet; color: white; border-radius: 12px;">${verificationToken.token}</h1>
+        <h3 style="text-align: center; margin: 10px auto;padding: 0;">Greetings from the work team</h3>
+        <h2 style="text-align: center; margin: 10px auto;padding: 0;">DOC on call</h2>
+        <h5 style="text-align: center; margin: 10px auto;padding: 0;">All Rights reserved DOC on call</h5>
     </div>`
     await sendEmail(user.email, "Verify your Email", htmlTemplate)
 
@@ -93,16 +94,17 @@ export const loginUserCtrl = asyncHandler(async (req, res) => {
             await verificationToken.save()
         }
         const htmlTemplate = `
-    <div>
-        <p>Your code is</p>
-        <h1>${verificationToken.token}</h1>
-        <p>Greetings from the work team</p>
-        <h2>DOC on call</h2>
+        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 10% auto;padding: 20px; border: 1px solid gray;background-color: lavender; color: blueviolet;border-radius: 10px; width: 80%;">
+        <h3 style="text-align: center; margin: 10px auto;padding: 0;">Your activation code is</h3>
+        <h1 style="text-align: center; margin: 25px auto;padding: 10px 20px; background-color: blueviolet; color: white; border-radius: 12px;">${verificationToken.token}</h1>
+        <h3 style="text-align: center; margin: 10px auto;padding: 0;">Greetings from the work team</h3>
+        <h2 style="text-align: center; margin: 10px auto;padding: 0;">DOC on call</h2>
+        <h5 style="text-align: center; margin: 10px auto;padding: 0;">All Rights reserved DOC on call</h5>
     </div>
     `
         await sendEmail(user.email, "Verify your Email", htmlTemplate)
 
-        res.status(500).json({ message: "We send to you an email, please verify your email address",id:user._id })
+        res.status(500).json({ message: "We send to you an email, please verify your email address", id: user._id })
     }
     if (user.isBlocked === true) {
         return res.status(500).json({ message: "Email is Blocked" })

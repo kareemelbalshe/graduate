@@ -8,42 +8,45 @@ import asyncHandler from "express-async-handler"
 export const getCheckoutSession=asyncHandler(async(req,res)=>{
     try {
         const doctor=await Doctor.findOne({user:req.params.id})
-        const user =await User.findById(req.user.id)
-
-        const stripe=new Stripe(process.env.STRIPE_SECRET_KEY)
-
-        const session=await stripe.checkout.sessions.create({
-            payment_method_types:['card'],
-            mode:'payment',
-            success_url:'http://localhost:58217/checkout-success',
-            cancel_url:`${req.protocol}://${req.get('host')}/doctors/${doctor._id}`,
-            customer_email:user.email,
-            client_reference_id:req.params.doctorId,
-            line_items:[
-                {
-                    price_data:{
-                        currency:'bdt',
-                        unit_amount:doctor.ticketPrice*100,
-                        product_data:{
-                            name:doctor.user.username,
-                            images:[doctor.user.photo]
-                        }
-                    },
-                    quantity:1
-                }
-            ]
-        })
+        const user=await User.findById(req.user.id)
+        const book=await Booking.findOne({user:req.user.id,doctor:req.params.id,createdAt:-1})
+        console.log(book)
+        if(book.status==="approved"||book.status==="cancelled"){
         const booking=new Booking({
-            doctor:doctor.user._id,
-            user:user._id,
+            doctor:req.params.id,
+            user:req.user.id,
             ticketPrice:doctor.ticketPrice,
-            session:session.id
+            status:"pending"
         })
         await booking.save()
-        res.status(200).json({success:true,message:'Successfully paid',session})
-    } catch (error) {
-        res.status(500).json({success:false,message:'Error creating checkout session',session})
+        doctor.booking.push(booking)
+        user.Reservations.push(booking)
+        res.status(200).json({success:true,message:'Successfully booking',booking})
     }
+    else{
+        res.status(500).json({success:false,message:'wait until approv'})
+    }
+    } catch (error) {
+        res.status(500).json({success:false,message:'Error creating checkout session'})
+    }
+})
+
+export const approvedBooking=asyncHandler(async(req,res)=>{
+    const book=await Booking.findByIdAndUpdate(req.params.id,{
+        $set:{
+            status:"approved"
+        }
+    })
+    res.status(200).json({success:true,message:'Successfully approved',book})
+})
+
+export const cancelledBooking=asyncHandler(async(req,res)=>{
+    const book=await Booking.findByIdAndUpdate(req.params.id,{
+        $set:{
+            status:"cancelled"
+        }
+    })
+    res.status(200).json({success:true,message:'Successfully approved',book})
 })
 
 export const getAllBooking=asyncHandler(async(req,res)=>{
