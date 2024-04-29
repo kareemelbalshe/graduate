@@ -102,7 +102,7 @@ export const loginUserCtrl = asyncHandler(async (req, res) => {
     `
         await sendEmail(user.email, "Verify your Email", htmlTemplate)
 
-        res.status(400).json({ message: "We send to you an email, please verify your email address" })
+        res.status(500).json({ message: "We send to you an email, please verify your email address",id:user._id })
     }
     if (user.isBlocked === true) {
         return res.status(500).json({ message: "Email is Blocked" })
@@ -110,8 +110,6 @@ export const loginUserCtrl = asyncHandler(async (req, res) => {
     const token = user.generateAuthToken()
 
     res.status(200).json({
-        _id: user._id,
-        role: user.role,
         photo: user.photo,
         token,
         username: user.username

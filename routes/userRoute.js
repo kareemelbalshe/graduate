@@ -27,12 +27,12 @@ router.route("/block").post(verifyTokenAndAdmin, makeBlock)
 
 
 
-router.get("/doctor", verifyToken, isBlock, getDoctor)
-router.get("/location", verifyToken, isBlock, getLocations)
+router.get("/doctor", getDoctor)
+router.get("/location", getLocations)
 
 
 router.route("/profile/:id")
-    .get(validateObject, verifyTokenAndOnlyUser, isBlock, getUserProfileCtrl)
+    .get(validateObject, getUserProfileCtrl)
     .put(validateObject, verifyTokenAndOnlyUser, isBlock, updateUserProfileCtrl)
     .delete(validateObject, verifyTokenAndAuthorization, isBlock, deleteUserProfileCtrl)
     .post(validateObject, verifyDoctor, isBlock, updateDoctor)
@@ -87,10 +87,10 @@ router.get("/search-patient", verifyDoctor, isBlock, searchAboutPatient)
 router.get("/search-doctor", verifyToken, isBlock, searchAboutDoctor)
 
 
-router.get("/popular-doctors", verifyToken, isBlock, popularDoctor)
+router.get("/popular-doctors", popularDoctor)
 
 
-router.get("/new-doctors", verifyToken, isBlock, newDoctor)
+router.get("/new-doctors", newDoctor)
 
 
 export default router

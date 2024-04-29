@@ -68,5 +68,8 @@ export const resetPasswordCtrl = asyncHandler(async (req, res) => {
         await user.save()
         await verificationToken.deleteOne({ userId: req.params.userId })
     }
+    else{
+        res.status(500).json({ message: "password and confirm not match" })
+    }
     res.status(200).json({ message: "Password reset successfully, please log in" })
 })

@@ -72,8 +72,10 @@ export const getMessages = asyncHandler(async (req, res) => {
 		if (!conversation) return res.status(200).json([]);
 
 		const messages = conversation.messages;
+		const sender=await User.findById(senderId).select("-password -wishlist -ChatList -Reservations")
+		const receiver=await User.findById(userToChatId).select("-password -wishlist -ChatList -Reservations")
 
-		res.status(200).json(messages);
+		res.status(200).json({sender,receiver,messages});
 	} catch (error) {
 		console.log("Error in getMessages controller: ", error.message);
 		res.status(500).json({ error: "Internal server error" });

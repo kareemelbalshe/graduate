@@ -11,6 +11,7 @@ import Review from "../models/Review.js";
 import History from "../models/History.js";
 import Report from "../models/report.js"
 import Message from "../models/Message.js";
+import Location from "../models/location.js";
 
 
 export const getAllUsersCtrl = asyncHandler(async (req, res) => {
@@ -27,10 +28,6 @@ export const getUserProfileCtrl = asyncHandler(async (req, res) => {
 })
 
 export const updateUserProfileCtrl = asyncHandler(async (req, res) => {
-    // const { error } = validateUpdateUser(req.body)
-    // if (error) {
-    //     return res.status(400).json({ message: error.details[0].message })
-    // }
     if (req.body.password) {
         const salt = await bcrypt.genSalt(10)
         req.body.password = await bcrypt.hash(req.body.password, salt)
@@ -44,14 +41,9 @@ export const updateUserProfileCtrl = asyncHandler(async (req, res) => {
             bloodType: req.body.bloodType,
             phone: req.body.phone,
         }
-    }, { new: true }).select("-password -wishlist -ChatList -Reservations").populate("history").populate("doctors")
+    }, { new: true }).select("-password -wishlist -ChatList -Reservations").populate("history").populate("doctors","-likes")
     res.status(200).json(updateUser)
 })
-
-// export const getUsersCountCtrl = asyncHandler(async (req, res) => {
-//     const count = await User.count()
-//     res.status(200).json(count)
-// })
 
 export const profilePhotoUploadCtrl = asyncHandler(async (req, res) => {
     if (!req.file) {
@@ -106,6 +98,10 @@ export const deleteUserProfileCtrl = asyncHandler(async (req, res) => {
     await Review.deleteMany({ user: user._id })
     await Doctor.deleteMany({ user: user._id })
     await History.deleteMany({ user: user._id })
+    await Message.deleteMany({ senderId: user._id })
+    await Message.deleteMany({ receiverId: user._id })
+    await Location.deleteMany({ userId: user._id })
+    await Report.deleteMany({ userId: user._id })
 
     await User.findByIdAndDelete(req.params.id)
 
@@ -178,13 +174,7 @@ export const getAllReports = asyncHandler(async (req, res) => {
 
 
 export const deleteReport = asyncHandler(async (req, res) => {
-    const report = await Report.findByIdAndDelete(req.params.id)
+    await Report.findByIdAndDelete(req.params.id)
 
     res.status(200).json({ message: "report deleted" })
 })
-// setInterval(async()=>{
-//         const report=await Report.find()
-//         report.map(r=>{
-//             Date.now()-Date(r.createdAt)>
-//         })
-//     },1000*60*60*24)
