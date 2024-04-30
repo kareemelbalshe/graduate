@@ -6,7 +6,7 @@ import { photoUpload } from "../middlewares/photoUpload.js";
 import { isBlock } from "../middlewares/isBlock.js";
 import { getChatList, getAllDoctors, getLikeList, getWishList, toggleLikeCtrl, updateDoctor, popularDoctor, newDoctor, getDoctor, searchAboutPatient, searchAboutDoctor } from "../controllers/doctorController.js";
 import { createHistory, deleteHistory, getAllHistory, getSingleHistory, getUserHistory, updateHistory, updateHistoryPhoto } from "../controllers/historyController.js";
-import { approvedBooking, cancelledBooking, deleteBooking, getAllBooking, getBookingToDoctor, getBookingToPatient, getCheckoutSession } from "../controllers/bookingController.js";
+import { approvedBooking, cancelledBooking, deleteBooking, getAllBooking, getBookingToDoctor, getBookingToPatient, getCheckoutSession, setTime } from "../controllers/bookingController.js";
 import { createReview, deleteReview, getAllReviews, getDoctorReviews, updateReviewCtrl } from "../controllers/reviewController.js";
 import { createLocation, deleteLocation, getAllLocations, getLocations } from "../controllers/locationController.js";
 
@@ -41,8 +41,9 @@ router.route("/profile/profile-photo-upload")
 
 
 router.post('/:id/booking', validateObject, verifyToken, getCheckoutSession)
-router.post('/booking/:bookingId', verifyToken, approvedBooking)
-router.put('/booking/:bookingId', verifyToken, cancelledBooking)
+router.post('/booking-approve/:bookingId', verifyDoctor, approvedBooking)
+router.post('/booking-cancel/:bookingId', verifyToken, cancelledBooking)
+router.post('/booking-time/:bookingId', verifyDoctor, setTime)
 router.delete('/booking/:bookingId', verifyToken, deleteBooking)
 router.get('/booking-doctor', verifyDoctor, getBookingToDoctor)
 router.get('/booking-patient', verifyToken, getBookingToPatient)

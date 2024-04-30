@@ -18,6 +18,9 @@ const Booking = new Schema(
       enum: ["pending", "approved", "cancelled"],
       default: "pending",
     },
+    time:{
+      type:Date
+    }
   }, {
     timestamps: true,
     toJSON: { virtuals: true },

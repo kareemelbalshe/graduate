@@ -7,7 +7,7 @@ import asyncHandler from "express-async-handler"
 export const getCheckoutSession = asyncHandler(async (req, res) => {
     try {
         const doctor = await Doctor.findOne({ user: req.params.id })
-        const user = await User.findById(req.user.id)
+        // const user = await User.findById(req.user.id)
         // const book = await Booking.find({ user: req.user.id, doctor: req.params.id})
         const booking = new Booking({
             doctor: req.params.id,
@@ -15,17 +15,17 @@ export const getCheckoutSession = asyncHandler(async (req, res) => {
             ticketPrice: doctor.ticketPrice,
             status: "pending"
         })
+        booking.save()
         await Doctor.findOneAndUpdate({ user: req.params.id }, {
-            $set: {
+            $push: {
                 booking: booking._id
             }
         })
         await User.findByIdAndUpdate(req.user.id, {
-            $set: {
+            $push: {
                 Reservations: booking._id
             }
         })
-        await Promise.all([booking.save()])
         res.status(200).json({ success: true, message: 'Successfully booking', booking })
     } catch (error) {
         res.status(500).json({ success: false, message: 'Error creating booking' })
@@ -46,6 +46,21 @@ export const getBookingToPatient = asyncHandler(async (req, res) => {
     const book = user.Reservations
     const reservations = await Booking.find({ _id: { $in: book } }).populate("doctor", "-password -wishlist -ChatList -Reservations")
     res.status(200).json(reservations)
+})
+
+export const setTime=asyncHandler(async (req, res) => {
+    let book=await Booking.findById(req.params.bookingId)
+        if(book.status==="approved"){
+            book=await Booking.findByIdAndUpdate(req.params.bookingId,{
+                $set:{
+                    time:req.body.time
+                }
+            })
+            res.status(200).json(book)
+        }
+        else{
+            res.status(200).json({message:"you should approve"})
+        }
 })
 
 export const approvedBooking = asyncHandler(async (req, res) => {
