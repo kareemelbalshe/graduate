@@ -6,7 +6,7 @@ import asyncHandler from "express-async-handler"
 export const getAllReviews = asyncHandler(async (req, res) => {
     try {
         const reviews = await Review.find().populate("user", "-password -wishlist -ChatList -Reservations")
-            .populate("doctor", "-likes -reviews")
+            .populate("doctor", "-likes -reviews -booking")
 
         res.status(200).json({ success: true, message: "successful", data: reviews })
     } catch (error) {

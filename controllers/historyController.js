@@ -109,7 +109,7 @@ export const updateHistory = asyncHandler(async (req, res) => {
             category: req.body.category,
             date: req.body.date
         }
-    }, { new: true }).populate("user", "-password -wishlist -ChatList -Reservations").populate("doctor", "-likes -reviews")
+    }, { new: true }).populate("user", "-password -wishlist -ChatList -Reservations").populate("doctor", "-likes -reviews -booking")
 
     res.status(200).json(updateHistory)
 })

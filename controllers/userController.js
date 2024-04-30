@@ -160,10 +160,10 @@ export const getAllReports = asyncHandler(async (req, res) => {
                 .populate("receiverId", "-password -wishlist -ChatList -Reservations");
         } else if (kind === "history") {
             response = await History.findById(v.about).populate("user", "-password -wishlist -ChatList -Reservations")
-                .populate("doctor", "-likes -reviews");
+                .populate("doctor", "-likes -reviews -booking");
         } else if (kind === "review") {
             response = await Review.findById(v.about).populate("user", "-password -wishlist -ChatList -Reservations")
-                .populate("doctor", "-likes -reviews");
+                .populate("doctor", "-likes -reviews -booking");
         }
 
         resp.push({ response, description: v.description });

@@ -4,7 +4,7 @@ import asyncHandler from "express-async-handler"
 
 
 export const getAllDoctors = asyncHandler(async (req, res) => {
-    const doctors = await User.find({ role: 'doctor' }).populate("doctors").select("-password")
+    const doctors = await User.find({ role: 'doctor' }).populate("doctors","-likes").select("-password -wishlist -ChatList -Reservations")
     res.status(200).json(doctors)
 })
 
@@ -99,12 +99,12 @@ export const searchAboutPatient = asyncHandler(async (req, res) => {
                 $regex: username,
                 $options: "i",
             }
-        }).select("-password -wishlist -ChatList -Reservations").populate("doctors", "-likes -reviews")
+        }).select("-password -wishlist -ChatList -Reservations")
     }
     else if (id) {
         patient = await User.find({
             role: "patient", _id: req?.body.id,
-        }).select("-password -wishlist -ChatList -Reservations").populate("doctors", "-likes -reviews")
+        }).select("-password -wishlist -ChatList -Reservations")
     }
     res.status(200).json(patient)
 })
@@ -120,7 +120,7 @@ export const searchAboutDoctor = asyncHandler(async (req, res) => {
                 $regex: username,
                 $options: "i",
             }
-        }).select("-password -wishlist -ChatList -Reservations").populate("doctors", "-likes -reviews")
+        }).select("-password -wishlist -ChatList -Reservations").populate("doctors", "-likes -reviews -booking")
     }
     else if (id) {
         doctor = await User.find({
@@ -136,7 +136,7 @@ export const popularDoctor = asyncHandler(async (req, res) => {
 })
 
 export const newDoctor = asyncHandler(async (req, res) => {
-    const doctor = await Doctor.find().select("-likes -reviews").populate("user", "-password -wishlist -ChatList -Reservations").sort({ createdAt: -1 }).limit(20)
+    const doctor = await Doctor.find().select("-likes -reviews -booking").populate("user", "-password -wishlist -ChatList -Reservations").sort({ createdAt: -1 }).limit(20)
     res.status(200).json(doctor)
 })
 
