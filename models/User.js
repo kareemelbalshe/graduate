@@ -4,7 +4,6 @@ import jwt from 'jsonwebtoken';
 import passwordComplexity from 'joi-password-complexity';
 
 const User = new Schema({
-    // googleId:String,
     username: {
         type: String,
         required: true,
@@ -32,10 +31,7 @@ const User = new Schema({
     birthday: {
         type: Date,
     },
-    Reservations: {
-        type: Array,
-        default: [],
-    },
+    Reservations: [{ type: Schema.Types.ObjectId }],
     photo: {
         type: Object,
         default: {
@@ -77,12 +73,6 @@ User.virtual("doctors", {
 
 User.virtual("reviews", {
     ref: "Review",
-    foreignField: "doctor",
-    localField: "_id"
-})
-
-User.virtual("booking", {
-    ref: "Booking",
     foreignField: "doctor",
     localField: "_id"
 })

@@ -68,7 +68,7 @@ export const getLikeList = asyncHandler(async (req, res) => {
     const doctor = await Doctor.findOne({ user: req.params.id })
 
     const users = doctor.likes
-    const likeList = await User.find({ _id: { $in: users } }).select("-password").select("-wishlist").select("-ChatList")
+    const likeList = await User.find({ _id: { $in: users } }).select("-password -Reservations").select("-wishlist").select("-ChatList")
 
     res.status(200).json(likeList)
 })
@@ -76,7 +76,7 @@ export const getLikeList = asyncHandler(async (req, res) => {
 export const getWishList = asyncHandler(async (req, res) => {
     const user = await User.findById(req.params.id)
     const doctors = user.wishlist
-    const wishList = await User.find({ _id: { $in: doctors } }).select("-password").select("-likes").select("-ChatList")
+    const wishList = await User.find({ _id: { $in: doctors } }).select("-password -Reservations").select("-likes").select("-ChatList")
     res.status(200).json(wishList)
 })
 

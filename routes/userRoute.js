@@ -6,7 +6,7 @@ import { photoUpload } from "../middlewares/photoUpload.js";
 import { isBlock } from "../middlewares/isBlock.js";
 import { getChatList, getAllDoctors, getLikeList, getWishList, toggleLikeCtrl, updateDoctor, popularDoctor, newDoctor, getDoctor, searchAboutPatient, searchAboutDoctor } from "../controllers/doctorController.js";
 import { createHistory, deleteHistory, getAllHistory, getSingleHistory, getUserHistory, updateHistory, updateHistoryPhoto } from "../controllers/historyController.js";
-import { getCheckoutSession } from "../controllers/bookingController.js";
+import { approvedBooking, cancelledBooking, deleteBooking, getAllBooking, getBookingToDoctor, getBookingToPatient, getCheckoutSession } from "../controllers/bookingController.js";
 import { createReview, deleteReview, getAllReviews, getDoctorReviews, updateReviewCtrl } from "../controllers/reviewController.js";
 import { createLocation, deleteLocation, getAllLocations, getLocations } from "../controllers/locationController.js";
 
@@ -18,7 +18,7 @@ router.get("/admin/dashboard/history", verifyTokenAndAdmin, getAllHistory)
 router.get("/admin/dashboard/doctor", verifyTokenAndAdmin, getAllDoctors)
 router.get("/admin/dashboard/search-doctor", verifyTokenAndAdmin, searchAboutDoctor)
 router.get("/admin/dashboard/review", verifyTokenAndAdmin, getAllReviews)
-router.get("/admin/dashboard/report", verifyTokenAndAdmin, getAllReports)
+router.get("/admin/dashboard/booking", verifyTokenAndAdmin, getAllBooking)
 
 router.route('/profile/:id/makeDoctor')
     .post(validateObject, verifyTokenAndAdmin, UserBeDoctor)
@@ -39,7 +39,13 @@ router.route("/profile/:id")
 router.route("/profile/profile-photo-upload")
     .post(verifyToken, photoUpload.single("image"), profilePhotoUploadCtrl)
 
-router.post('/profile/:id/booking', validateObject, verifyToken, getCheckoutSession)
+
+router.post('/:id/booking', validateObject, verifyToken, getCheckoutSession)
+router.post('/booking/:bookingId', verifyToken, approvedBooking)
+router.put('/booking/:bookingId', verifyToken, cancelledBooking)
+router.delete('/booking/:bookingId', verifyToken, deleteBooking)
+router.get('/booking-doctor', verifyDoctor, getBookingToDoctor)
+router.get('/booking-patient', verifyToken, getBookingToPatient)
 
 
 router.route("/:id/like").post(validateObject, verifyToken, isBlock, toggleLikeCtrl)
@@ -78,17 +84,17 @@ router.route("/history/update-image/:historyId")
     .put(validateObject, verifyTokenAndOnlyUser, photoUpload.single("image"), updateHistoryPhoto)
 
 
+
 router.route("/:id/report")
     .post(validateObject, verifyToken, isBlock, createReport)
     .delete(validateObject, verifyTokenAndAdmin, isBlock, deleteReport)
 
 
+
 router.get("/search-patient", verifyDoctor, isBlock, searchAboutPatient)
 router.get("/search-doctor", verifyToken, isBlock, searchAboutDoctor)
 
-
 router.get("/popular-doctors", popularDoctor)
-
 
 router.get("/new-doctors", newDoctor)
 

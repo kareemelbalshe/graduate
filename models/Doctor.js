@@ -71,7 +71,7 @@ const Doctor = new Schema({
         type: Number,
         default: 0,
     },
-    booking:[{ type: Schema.Types.ObjectId, ref: "Booking" }]
+    booking:[{ type: Schema.Types.ObjectId }]
 }, {
     timestamps: true,
     toJSON: { virtuals: true },

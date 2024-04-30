@@ -27,7 +27,7 @@ export const updateLocation = asyncHandler(async (req, res) => {
 
 export const getAllLocations = asyncHandler(async (req, res) => {
     const userId = req.params.id;
-    const locations = await Location.find({ userId }).populate("user", "-password -wishlist -ChatList -Reservations");
+    const locations = await Location.findOne({ userId:userId }).populate("user", "-password -wishlist -ChatList -Reservations");
     res.json(locations);
 })
 
