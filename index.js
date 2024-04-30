@@ -7,7 +7,6 @@ import authRoute from './routes/authRoute.js'
 import userRoute from './routes/userRoute.js'
 import messageRoute from './routes/messageRoute.js'
 import passwordRoute from './routes/passwordRoute.js'
-// import passport from "passport"
 import { app, server } from "./middlewares/socket.js"
 import xss from 'xss-clean'
 import hpp from "hpp"
@@ -28,9 +27,6 @@ app.use(rateLimiting({
     windowMs: 10 * 60 * 1000,
     max: 200
 }))
-
-// app.use(passport.initialize());
-// app.use(passport.session());
 
 app.use("/api/auth", authRoute)
 app.use("/api/users", userRoute)
