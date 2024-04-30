@@ -21,7 +21,7 @@ export const getDoctorReviews = asyncHandler(async (req, res) => {
 
 export const createReview = asyncHandler(async (req, res) => {
     const id = req.params.id
-    const reviews = await Review.find({ doctor:id,user:req.user.id })
+    const reviews = await Review.find({ doctor: id, user: req.user.id })
     if (!reviews) {
         const newReview = new Review({
             user: req.user.id,

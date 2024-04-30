@@ -46,7 +46,7 @@ const User = new Schema({
     ChatList: [{ type: Schema.Types.ObjectId, ref: "User" }],
     role: {
         type: String,
-        enum: ["patient", "admin","doctor"],
+        enum: ["patient", "admin", "doctor"],
         default: "patient",
     },
     gender: { type: String, enum: ["male", "female", "other"] },

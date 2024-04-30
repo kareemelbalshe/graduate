@@ -4,7 +4,7 @@ import asyncHandler from "express-async-handler"
 
 
 export const getAllDoctors = asyncHandler(async (req, res) => {
-    const doctors = await User.find({ role: 'doctor' }).populate("doctors","-likes").select("-password -wishlist -ChatList -Reservations")
+    const doctors = await User.find({ role: 'doctor' }).populate("doctors", "-likes").select("-password -wishlist -ChatList -Reservations")
     res.status(200).json(doctors)
 })
 
@@ -131,7 +131,7 @@ export const searchAboutDoctor = asyncHandler(async (req, res) => {
 })
 
 export const popularDoctor = asyncHandler(async (req, res) => {
-    const doctor = await Doctor.find({specialization:req.query.specialization}).select("-reviews").populate("user", "-password -wishlist -ChatList -Reservations").sort({ totalRating: -1, averageRating: -1, likes: -1 }).limit(10)
+    const doctor = await Doctor.find({ specialization: req.query.specialization }).select("-reviews").populate("user", "-password -wishlist -ChatList -Reservations").sort({ totalRating: -1, averageRating: -1, likes: -1 }).limit(10)
     res.status(200).json(doctor)
 })
 

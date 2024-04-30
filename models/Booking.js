@@ -18,13 +18,13 @@ const Booking = new Schema(
       enum: ["pending", "approved", "cancelled"],
       default: "pending",
     },
-    time:{
-      type:Date
+    time: {
+      type: Date
     }
   }, {
-    timestamps: true,
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true }
+  timestamps: true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
 });
 
 export default model("Booking", Booking);

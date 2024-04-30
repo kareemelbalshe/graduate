@@ -41,7 +41,7 @@ export const updateUserProfileCtrl = asyncHandler(async (req, res) => {
             bloodType: req.body.bloodType,
             phone: req.body.phone,
         }
-    }, { new: true }).select("-password -wishlist -ChatList -Reservations").populate("history").populate("doctors","-likes")
+    }, { new: true }).select("-password -wishlist -ChatList -Reservations").populate("history").populate("doctors", "-likes")
     res.status(200).json(updateUser)
 })
 

@@ -13,13 +13,13 @@ const Report = new Schema({
         ref: "User",
         required: true,
     },
-    about:{
+    about: {
         type: Schema.Types.ObjectId,
         required: true,
     },
-    kind:{
-        type:String,
-        enum: ["user","message","review","history"],
+    kind: {
+        type: String,
+        enum: ["user", "message", "review", "history"],
         required: true,
     }
 }, {

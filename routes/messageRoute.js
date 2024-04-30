@@ -6,8 +6,8 @@ import { isBlock } from "../middlewares/isBlock.js";
 
 const router = new Router()
 
-router.get("/:id",validateObject,verifyToken ,isBlock, getMessages);
-router.delete("/message/:id",validateObject,verifyTokenAndOnlyUser ,isBlock, deleteMessage)
+router.get("/:id", validateObject, verifyToken, isBlock, getMessages);
+router.delete("/message/:id", validateObject, verifyTokenAndOnlyUser, isBlock, deleteMessage)
 router.post("/send/:id", validateObject, verifyToken, isBlock, sendMessage);
 
 export default router

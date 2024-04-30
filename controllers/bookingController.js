@@ -48,19 +48,19 @@ export const getBookingToPatient = asyncHandler(async (req, res) => {
     res.status(200).json(reservations)
 })
 
-export const setTime=asyncHandler(async (req, res) => {
-    let book=await Booking.findById(req.params.bookingId)
-        if(book.status==="approved"){
-            book=await Booking.findByIdAndUpdate(req.params.bookingId,{
-                $set:{
-                    time:req.body.time
-                }
-            })
-            res.status(200).json(book)
-        }
-        else{
-            res.status(200).json({message:"you should approve"})
-        }
+export const setTime = asyncHandler(async (req, res) => {
+    let book = await Booking.findById(req.params.bookingId)
+    if (book.status === "approved") {
+        book = await Booking.findByIdAndUpdate(req.params.bookingId, {
+            $set: {
+                time: req.body.time
+            }
+        })
+        res.status(200).json(book)
+    }
+    else {
+        res.status(200).json({ message: "you should approve" })
+    }
 })
 
 export const approvedBooking = asyncHandler(async (req, res) => {

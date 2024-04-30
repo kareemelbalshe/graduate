@@ -17,16 +17,16 @@ const History = new Schema({
     doctor: {
         type: Schema.Types.ObjectId,
         ref: "User",
-        default:"Not at app"
+        default: "Not at app"
     },
-    date:{
-        type:Date,
-        required:true
+    date: {
+        type: Date,
+        required: true
     },
     category: {
         type: String,
         required: true,
-        enum: ["t7alel", "rojeta","ashe3a"],
+        enum: ["t7alel", "rojeta", "ashe3a"],
     },
     image: {
         type: Object,

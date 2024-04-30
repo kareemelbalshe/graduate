@@ -18,12 +18,12 @@ export const verifyToken = function (req, res, next) {
     }
 }
 
-export const verifyDoctor=function(req,res,next){
-    verifyToken(req,res,()=>{
-        if(req.user.role==='doctor'){
+export const verifyDoctor = function (req, res, next) {
+    verifyToken(req, res, () => {
+        if (req.user.role === 'doctor') {
             next()
         }
-        else{
+        else {
             return res.status(403).json({ message: "not allowed, only doctor" })
         }
     })
@@ -31,7 +31,7 @@ export const verifyDoctor=function(req,res,next){
 
 export const verifyTokenAndAdmin = function (req, res, next) {
     verifyToken(req, res, () => {
-        if (req.user.role==='admin') {
+        if (req.user.role === 'admin') {
             next()
         }
         else {
@@ -53,7 +53,7 @@ export const verifyTokenAndOnlyUser = function (req, res, next) {
 
 export const verifyTokenAndAuthorization = function (req, res, next) {
     verifyToken(req, res, () => {
-        if (req.user.id = req.params.id || req.user.role==='admin') {
+        if (req.user.id = req.params.id || req.user.role === 'admin') {
             next()
         }
         else {
