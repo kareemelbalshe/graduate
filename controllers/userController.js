@@ -127,13 +127,13 @@ export const UserBeDoctor = asyncHandler(async (req, res) => {
 export const makeBlock = asyncHandler(async (req, res) => {
 
     const user = await User.findById(req.params.id)
-    if(user.isBlocked===false){
-        user.isBlocked=true
-        res.status(201).json({message:"user blocked"})
+    if (user.isBlocked === false) {
+        user.isBlocked = true
+        res.status(201).json({ message: "user blocked" })
     }
-    else{
-        user.isBlocked=false
-        res.status(201).json({message:"user un blocked"})
+    else {
+        user.isBlocked = false
+        res.status(201).json({ message: "user un blocked" })
     }
 })
 
