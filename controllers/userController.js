@@ -117,8 +117,6 @@ export const UserBeDoctor = asyncHandler(async (req, res) => {
     const token = user.generateAuthToken()
     const doctor = await Doctor.create({ user: req.params.id })
     res.status(200).json({
-        _id: user._id,
-        role: user.role,
         photo: user.photo,
         token,
         username: user.username,
@@ -127,12 +125,16 @@ export const UserBeDoctor = asyncHandler(async (req, res) => {
 })
 
 export const makeBlock = asyncHandler(async (req, res) => {
-    const user = await User.findByIdAndUpdate(req.body.id, {
-        $set: {
-            isBlocked: true
-        }
-    })
-    res.status(201).json(user)
+
+    const user = await User.findById(req.params.id)
+    if(user.isBlocked===false){
+        user.isBlocked=true
+        res.status(201).json({message:"user blocked"})
+    }
+    else{
+        user.isBlocked=false
+        res.status(201).json({message:"user un blocked"})
+    }
 })
 
 export const createReport = asyncHandler(async (req, res) => {

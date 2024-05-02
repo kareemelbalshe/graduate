@@ -83,7 +83,18 @@ export const getMessages = asyncHandler(async (req, res) => {
 });
 
 export const deleteMessage = asyncHandler(async (req, res) => {
-	const { id } = req.params;
-	await Message.findByIdAndDelete(id)
+	await Message.findByIdAndDelete(req.params.messageId) 
+
 	res.status(200).json({ message: "message is deleted" });
+})
+
+export const deleteConversation = asyncHandler(async (req, res) => {
+		const { id: userToChatId } = req.params;
+		const senderId = req.user.id;
+
+		await Conversation.findOneAndDelete({
+			participants: { $all: [senderId, userToChatId] },
+		}) // NOT REFERENCE BUT ACTUAL MESSAGES
+
+	res.status(200).json({ message: "Conversation is deleted" });
 })
