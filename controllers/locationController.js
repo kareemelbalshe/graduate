@@ -37,7 +37,7 @@ export const getLocations = asyncHandler(async (req, res) => {
 })
 
 export const deleteLocation = asyncHandler(async (req, res) => {
-    const id = req.params.id;
+    const id = req.params.locationId;
     await Location.findByIdAndDelete(id);
     res.json({ message: 'Location deleted' });
 })

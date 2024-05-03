@@ -32,6 +32,7 @@ router.get("/doctor", getDoctor)
 router.get("/location", getLocations)
 
 
+
 router.route("/profile/:id")
     .get(validateObject, getUserProfileCtrl)
     .put(validateObject, verifyTokenAndOnlyUser, isBlock, updateUserProfileCtrl)
@@ -39,14 +40,16 @@ router.route("/profile/:id")
     .post(validateObject, verifyDoctor, isBlock, updateDoctor)
 router.route("/profile/profile-photo-upload")
     .post(verifyToken, isBlock, photoUpload.single("image"), profilePhotoUploadCtrl)
-isBlock,
 
-    router.post('/:id/booking', validateObject, verifyToken, isBlock, getCheckoutSession)
+
+
+router.post('/:id/booking', validateObject, verifyToken, isBlock, getCheckoutSession)
 router.post('/booking-approve/:bookingId', verifyDoctor, isBlock, approvedBooking)
 router.post('/booking-cancel/:bookingId', verifyToken, isBlock, cancelledBooking)
 router.delete('/booking/:bookingId', verifyToken, isBlock, deleteBooking)
 router.get('/booking-doctor', verifyDoctor, isBlock, getBookingToDoctor)
 router.get('/booking-patient', verifyToken, isBlock, getBookingToPatient)
+
 
 
 router.route("/:id/like").post(validateObject, verifyToken, isBlock, toggleLikeCtrl)
@@ -58,9 +61,11 @@ router.route("/:id/chat-list")
     .get(validateObject, verifyTokenAndOnlyUser, isBlock, getChatList)
 
 
+
 router.route("/profile/:id/review")
     .get(validateObject, verifyDoctor, isBlock, getDoctorReviews)
     .post(validateObject, verifyToken, isBlock, createReview)
+router.route("/profile/:id/review/:reviewId")
     .put(validateObject, verifyToken, isBlock, updateReviewCtrl)
     .delete(validateObject, verifyTokenAndAuthorization, isBlock, deleteReview)
 
@@ -69,6 +74,7 @@ router.route("/profile/:id/review")
 router.route('/profile/:id/location')
     .post(validateObject, verifyDoctor, isBlock, createLocation)
     .get(validateObject, verifyToken, isBlock, getAllLocations)
+router.route('/profile/:id/location/:locationId')
     .delete(validateObject, verifyTokenAndAuthorization, deleteLocation)
 
 
@@ -80,15 +86,16 @@ router.route("/profile/:id/history")
 router.route("/history/:historyId")
     .get(verifyToken, isBlock, getSingleHistory)
     .delete(verifyTokenAndAuthorization, isBlock, deleteHistory)
-    .put(verifyDoctor, isBlock, updateHistory)
+    .post(verifyDoctor, isBlock, updateHistory)
 router.route("/history/update-image/:historyId")
-    .put(validateObject, verifyTokenAndOnlyUser, isBlock, photoUpload.single("image"), updateHistoryPhoto)
+    .put(verifyTokenAndOnlyUser, isBlock, photoUpload.single("image"), updateHistoryPhoto)
 
 
 
 router.route("/:id/report")
     .post(validateObject, verifyToken, isBlock, createReport)
-    .delete(validateObject, verifyTokenAndAdmin, isBlock, deleteReport)
+router.route("/report/:reportId")
+    .delete(verifyTokenAndAdmin, isBlock, deleteReport)
 
 
 

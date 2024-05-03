@@ -8,7 +8,7 @@ const router = new Router()
 
 router.get("/:id", validateObject, verifyToken, isBlock, getMessages);
 router.delete("/:id", validateObject, verifyTokenAndOnlyUser, isBlock, deleteConversation);
-router.delete("/:messageId", validateObject, verifyTokenAndOnlyUser, isBlock, deleteConversation);
+router.delete("/:messageId", verifyTokenAndOnlyUser, isBlock, deleteConversation);
 router.post("/send/:id", validateObject, verifyToken, isBlock, sendMessage);
 
 export default router

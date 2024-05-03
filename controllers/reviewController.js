@@ -56,11 +56,7 @@ export const updateReviewCtrl = asyncHandler(async (req, res) => {
         return res.status(404).json({ message: "review not found" })
     }
 
-    if (req.user.id !== review.user.toString()) {
-        return res.status(403).json({ message: "access denied, only user himself can edit his review" })
-    }
-
-    const updateReview = await Review.findByIdAndUpdate(req.body.reviewId, {
+    const updateReview = await Review.findByIdAndUpdate(req.params.reviewId, {
         $set: {
             rating: req.body.rating,
             reviewText: req.body.reviewText
@@ -83,6 +79,23 @@ export const updateReviewCtrl = asyncHandler(async (req, res) => {
 })
 
 export const deleteReview = asyncHandler(async (req, res) => {
+    await Doctor.findOneAndUpdate({user:req.params.id},{
+        $pull:{
+            reviews:req.params.reviewId
+        }
+    })
     await Review.findOneAndRemove(req.params.reviewId)
-    res.status(200).json({ success: true, message: "Review deleted" })
+    const stats = await Review.find({ doctor: id })
+    let avg = 0
+    stats.map((v) => {
+        avg += v.rating
+    })
+
+    avg /= stats.length
+    await Doctor.findOneAndUpdate({ user: id }, {
+        $push: { reviews: savedReview._id },
+        totalRating: stats.length,
+        averageRating: avg
+    })
+    res.status(200).json({ success: true, message: "Review deleted", })
 })

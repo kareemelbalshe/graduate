@@ -176,7 +176,7 @@ export const getAllReports = asyncHandler(async (req, res) => {
 
 
 export const deleteReport = asyncHandler(async (req, res) => {
-    await Report.findByIdAndDelete(req.params.id)
+    await Report.findByIdAndDelete(req.params.reportId)
 
     res.status(200).json({ message: "report deleted" })
 })
