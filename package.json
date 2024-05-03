@@ -6,7 +6,11 @@
   "main": "app.js",
   "scripts": {
     "dev": "nodemon index.js",
-    "build": "npm i"
+    "build": "npm i",
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": "19.0.0"
   },
   "author": "Kareem Elbalshy",
   "license": "ISC",
