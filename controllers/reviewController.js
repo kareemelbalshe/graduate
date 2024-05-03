@@ -50,6 +50,7 @@ export const createReview = asyncHandler(async (req, res) => {
 })
 
 export const updateReviewCtrl = asyncHandler(async (req, res) => {
+    const id = req.params.id
 
     const review = await Review.findById(req.body.reviewId)
     if (!review) {
@@ -79,6 +80,8 @@ export const updateReviewCtrl = asyncHandler(async (req, res) => {
 })
 
 export const deleteReview = asyncHandler(async (req, res) => {
+    const id = req.params.id
+
     await Doctor.findOneAndUpdate({user:req.params.id},{
         $pull:{
             reviews:req.params.reviewId
