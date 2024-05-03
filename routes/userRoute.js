@@ -21,7 +21,7 @@ router.get("/admin/dashboard/review", verifyTokenAndAdmin, getAllReviews)
 router.get("/admin/dashboard/booking", verifyTokenAndAdmin, getAllBooking)
 router.get("/admin/dashboard/report", verifyTokenAndAdmin, getAllReports)
 
-router.route('/profile/:id/makeDoctor')
+router.route('/:id/makeDoctor')
     .post(validateObject, verifyTokenAndAdmin, UserBeDoctor)
 
 router.route("/block/:id").post(verifyTokenAndAdmin, makeBlock)
