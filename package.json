@@ -10,7 +10,7 @@
     "start": "node index.js"
   },
   "engines": {
-    "node": "19.0.0"
+    "node": "20.x"
   },
   "author": "Kareem Elbalshy",
   "license": "ISC",
