@@ -39,6 +39,10 @@ app.use("/api/password", passwordRoute)
 app.use(notFound)
 app.use(errorHandler)
 
+app.get('test',(req,res)=>{
+    res.json({message:"ok"})
+})
+
 server.listen(process.env.PORT, () => {
     connectDB()
 
