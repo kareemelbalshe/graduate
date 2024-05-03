@@ -6,7 +6,7 @@ import { photoUpload } from "../middlewares/photoUpload.js";
 import { isBlock } from "../middlewares/isBlock.js";
 import { getChatList, getAllDoctors, getLikeList, getWishList, toggleLikeCtrl, updateDoctor, popularDoctor, newDoctor, getDoctor, searchAboutPatient, searchAboutDoctor } from "../controllers/doctorController.js";
 import { createHistory, deleteHistory, getAllHistory, getSingleHistory, getUserHistory, updateHistory, updateHistoryPhoto } from "../controllers/historyController.js";
-import { approvedBooking, cancelledBooking, deleteBooking, getAllBooking, getBookingToDoctor, getBookingToPatient, getCheckoutSession, setTime } from "../controllers/bookingController.js";
+import { approvedBooking, cancelledBooking, deleteBooking, getAllBooking, getBookingToDoctor, getBookingToPatient, getCheckoutSession } from "../controllers/bookingController.js";
 import { createReview, deleteReview, getAllReviews, getDoctorReviews, updateReviewCtrl } from "../controllers/reviewController.js";
 import { createLocation, deleteLocation, getAllLocations, getLocations } from "../controllers/locationController.js";
 
@@ -19,6 +19,7 @@ router.get("/admin/dashboard/doctor", verifyTokenAndAdmin, getAllDoctors)
 router.get("/admin/dashboard/search-doctor", verifyTokenAndAdmin, searchAboutDoctor)
 router.get("/admin/dashboard/review", verifyTokenAndAdmin, getAllReviews)
 router.get("/admin/dashboard/booking", verifyTokenAndAdmin, getAllBooking)
+router.get("/admin/dashboard/report", verifyTokenAndAdmin, getAllReports)
 
 router.route('/profile/:id/makeDoctor')
     .post(validateObject, verifyTokenAndAdmin, UserBeDoctor)
@@ -43,7 +44,6 @@ isBlock,
     router.post('/:id/booking', validateObject, verifyToken, isBlock, getCheckoutSession)
 router.post('/booking-approve/:bookingId', verifyDoctor, isBlock, approvedBooking)
 router.post('/booking-cancel/:bookingId', verifyToken, isBlock, cancelledBooking)
-router.post('/booking-time/:bookingId', verifyDoctor, isBlock, setTime)
 router.delete('/booking/:bookingId', verifyToken, isBlock, deleteBooking)
 router.get('/booking-doctor', verifyDoctor, isBlock, getBookingToDoctor)
 router.get('/booking-patient', verifyToken, isBlock, getBookingToPatient)

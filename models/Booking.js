@@ -20,6 +20,9 @@ const Booking = new Schema(
     },
     time: {
       type: Date
+    },
+    cancelReason: {
+      type: String
     }
   }, {
   timestamps: true,
