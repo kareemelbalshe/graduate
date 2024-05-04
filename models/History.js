@@ -21,7 +21,6 @@ const History = new Schema({
     },
     date: {
         type: Date,
-        required: true
     },
     category: {
         type: String,

@@ -42,26 +42,27 @@ export const getAllHistory = asyncHandler(async (req, res) => {
         history = await History.find({ category: category })
             .sort({ createdAt: -1 })
             .populate("user", "-password -wishlist -ChatList -Reservations")
-            .populate("doctor", "-likes -reviews -booking")
+            .populate("doctor", "-password -wishlist -ChatList -Reservations")
     }
     else {
         history = await History.find()
-            .sort({ date: -1 })
+            .sort({ date: -1,createdAt:-1 })
             .populate("user", "-password -wishlist -ChatList -Reservations")
-            .populate("doctor", "-likes -reviews -booking")
+            .populate("doctor", "-password -wishlist -ChatList -Reservations")
     }
     res.status(200).json(history)
 })
 
 export const getUserHistory = asyncHandler(async (req, res) => {
-    const history = await History.find({ user: req.user.id })
+    const history = await History.find({ user: req.user.id }).populate("doctor", "-likes -reviews -booking")
+
     res.status(200).json(history)
 })
 
 export const getSingleHistory = asyncHandler(async (req, res) => {
     const history = await History.findById(req.params.historyId)
         .populate("user", "-password -wishlist -ChatList -Reservations")
-        .populate("doctor", "-likes -reviews -booking")
+        .populate("doctor", "-password -wishlist -ChatList -Reservations")
     if (!history) {
         return res.status(404).json({ message: 'history not found' })
     }
@@ -81,7 +82,7 @@ export const deleteHistory = asyncHandler(async (req, res) => {
         return res.status(404).json({ message: 'history not found' })
     }
 
-    if (req.user.role === 'admin' || req.user.id === history.user.toString()) {
+    if (req.user.role === 'admin' || req.user.id === history.user.toString() || req.user.id===history.doctor.toString()) {
         await cloudinaryRemoveImage(history.image.publicId)
         await History.findByIdAndDelete(req.params.historyId)
 
@@ -109,7 +110,7 @@ export const updateHistory = asyncHandler(async (req, res) => {
             category: req.body.category,
             date: req.body.date
         }
-    }, { new: true }).populate("user", "-password -wishlist -ChatList -Reservations").populate("doctor", "-likes -reviews -booking")
+    }, { new: true }).populate("user", "-password -wishlist -ChatList -Reservations").populate("doctor", "-password -wishlist -ChatList -Reservations")
 
     res.status(200).json(updateHistory)
 })
@@ -122,10 +123,6 @@ export const updateHistoryPhoto = asyncHandler(async (req, res) => {
     const history = await History.findById(req.params.historyId)
     if (!history) {
         return res.status(404).json({ message: 'history not found' })
-    }
-
-    if (req.user.id !== history.user.toString()) {
-        return res.status(403).json({ message: 'access denied,you are not allowed' })
     }
 
     await cloudinaryRemoveImage(history.image.publicId)

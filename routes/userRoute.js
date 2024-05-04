@@ -83,7 +83,7 @@ router.route("/profile/:id/history")
     .post(validateObject, verifyDoctor, isBlock, photoUpload.single("image"), createHistory)
     .get(validateObject, verifyToken, isBlock, getUserHistory)
 
-router.route("/history/:historyId")
+router.route("/profile/:id/history/:historyId")
     .get(verifyToken, isBlock, getSingleHistory)
     .delete(verifyTokenAndAuthorization, isBlock, deleteHistory)
     .post(verifyDoctor, isBlock, updateHistory)
