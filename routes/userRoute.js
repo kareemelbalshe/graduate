@@ -83,11 +83,11 @@ router.route("/profile/:id/history")
     .post(validateObject, verifyDoctor, isBlock, photoUpload.single("image"), createHistory)
     .get(validateObject, verifyToken, isBlock, getUserHistory)
 
-router.route("/profile/:id/history/:historyId")
+router.route("/profile/history/:historyId")
     .get(verifyToken, isBlock, getSingleHistory)
     .delete(verifyTokenAndAuthorization, isBlock, deleteHistory)
     .post(verifyDoctor, isBlock, updateHistory)
-router.route("/history/update-image/:historyId")
+router.route("/profile/history/update-image/:historyId")
     .put(verifyTokenAndOnlyUser, isBlock, photoUpload.single("image"), updateHistoryPhoto)
 
 
