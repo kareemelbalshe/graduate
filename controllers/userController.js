@@ -140,8 +140,8 @@ export const makeBlock = asyncHandler(async (req, res) => {
 export const createReport = asyncHandler(async (req, res) => {
     const report = await Report.create({
         user: req.user.id,
-        description: req.body.description,
         about: req.params.id,
+        description: req.body.description,
         kind: req.query.kind
     })
     res.status(200).json(report)

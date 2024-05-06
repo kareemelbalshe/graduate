@@ -100,7 +100,6 @@ router.route("/report/:reportId")
 
 
 router.get("/search-patient", verifyDoctor, isBlock, searchAboutPatient)
-router.get("/search-doctor", verifyToken, isBlock, searchAboutDoctor)
 
 router.get("/popular-doctors", popularDoctor)
 
