@@ -120,6 +120,8 @@ export const UserBeDoctor = asyncHandler(async (req, res) => {
         photo: user.photo,
         token,
         username: user.username,
+        _id: user._id,
+        role: user.role,
         doctor
     })
 })

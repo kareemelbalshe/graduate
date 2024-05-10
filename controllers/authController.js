@@ -114,7 +114,9 @@ export const loginUserCtrl = asyncHandler(async (req, res) => {
     res.status(200).json({
         photo: user.photo,
         token,
-        username: user.username
+        username: user.username,
+        _id: user._id,
+        role: user.role,
     })
 })
 
