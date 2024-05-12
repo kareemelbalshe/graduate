@@ -109,9 +109,14 @@ export const deleteUserProfileCtrl = asyncHandler(async (req, res) => {
 })
 
 export const UserBeDoctor = asyncHandler(async (req, res) => {
-    const user = await User.findByIdAndUpdate(req.params.id, {
+
+    const user = await User.findById(req.params.id)
+    if (user.role === "doctor") {
+        res.status(500).json({ message: "user is already doctor" })
+    }
+    await User.findByIdAndUpdate(req.params.id, {
         $set: {
-            role: 'doctor'
+            role: "doctor"
         }
     })
     const token = user.generateAuthToken()
@@ -131,10 +136,12 @@ export const makeBlock = asyncHandler(async (req, res) => {
     const user = await User.findById(req.params.id)
     if (user.isBlocked === false) {
         user.isBlocked = true
+        user.save()
         res.status(201).json({ message: "user blocked" })
     }
     else {
         user.isBlocked = false
+        user.save()
         res.status(201).json({ message: "user un blocked" })
     }
 })

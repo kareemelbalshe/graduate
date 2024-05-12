@@ -43,6 +43,7 @@ export const registerUserCtrl = asyncHandler(async (req, res) => {
         userId: user._id,
         token: code
     })
+
     await verificationToken.save()
     const htmlTemplate = `
     <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 10% auto;padding: 20px; border: 1px solid gray;background-color: lavender; color: blueviolet;border-radius: 10px; width: 80%;">
