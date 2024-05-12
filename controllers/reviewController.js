@@ -42,7 +42,7 @@ export const createReview = asyncHandler(async (req, res) => {
             totalRating: stats.length,
             averageRating: avg
         })
-        res.status(200).json({ success: true, message: "Review submitted", data: newReview })
+        res.status(200).json({ success: true, message: "Review submitted", data: savedReview })
     }
     else {
         res.status(500).json({ success: false, message: "you already reviewed" })

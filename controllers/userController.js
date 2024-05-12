@@ -42,7 +42,7 @@ export const updateUserProfileCtrl = asyncHandler(async (req, res) => {
             phone: req.body.phone,
         }
     }, { new: true }).select("-password -wishlist -ChatList -Reservations").populate("history").populate("doctors", "-likes")
-    res.status(200).json(updateUser)
+    res.status(200).json({ message: "user info updated", updateUser })
 })
 
 export const profilePhotoUploadCtrl = asyncHandler(async (req, res) => {
@@ -110,11 +110,11 @@ export const deleteUserProfileCtrl = asyncHandler(async (req, res) => {
 
 export const UserBeDoctor = asyncHandler(async (req, res) => {
 
-    const user = await User.findById(req.params.id)
+    let user = await User.findById(req.params.id)
     if (user.role === "doctor") {
         res.status(500).json({ message: "user is already doctor" })
     }
-    await User.findByIdAndUpdate(req.params.id, {
+    user = await User.findByIdAndUpdate(req.params.id, {
         $set: {
             role: "doctor"
         }
