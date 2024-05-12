@@ -56,7 +56,7 @@ export const approvedBooking = asyncHandler(async (req, res) => {
             cancelReason: ""
         }
     }).populate("user", "-password -wishlist -ChatList").populate("doctor", "-password -wishlist -ChatList").select("doctors").sort({ createdAt: -1 })
-    res.status(200).json({ success: true, message: 'Successfully approved', data:book })
+    res.status(200).json({ success: true, message: 'Successfully approved', data: book })
 })
 
 export const cancelledBooking = asyncHandler(async (req, res) => {
@@ -67,7 +67,7 @@ export const cancelledBooking = asyncHandler(async (req, res) => {
             time: ""
         }
     }).populate("user", "-password -wishlist -ChatList").populate("doctor", "-password -wishlist -ChatList").select("doctors").sort({ createdAt: -1 })
-    res.status(200).json({ success: true, message: 'Successfully approved', data:book })
+    res.status(200).json({ success: true, message: 'Successfully cancelled', data: book })
 })
 
 export const getAllBooking = asyncHandler(async (req, res) => {
