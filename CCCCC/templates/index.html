@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Symptom Checker</title>
+</head>
+
+<body>
+    <h1>YOUR NAME</h1>
+    <form action="/getInfo" method="POST">
+
+    <h1>Symptom Checker</h1>
+    <form action="/diagnose" method="POST">
+        <label for="symptoms">Select your symptoms:</label><br>
+        <input type="checkbox" id="symptoms" name="symptoms" value="Symptom 1">
+        <label for="symptom1">Symptom 1</label><br>
+        <input type="checkbox" id="symptoms" name="symptoms" value="Symptom 2">
+        <label for="symptom2">Symptom 2</label><br>
+        <input type="checkbox" id="symptoms" name="symptoms" value="Symptom 3">
+        <label for="symptom3">Symptom 3</label><br>
+        <!-- Add more symptoms checkboxes as needed -->
+
+        <input type="submit" value="Diagnose">
+    </form>
+</body>
+
+</html>

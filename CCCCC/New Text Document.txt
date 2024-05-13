@@ -1,0 +1,20 @@
+!DOCTYPE html
+html lang=en
+head
+    meta charset=UTF-8
+    meta name=viewport content=width=device-width, initial-scale=1.0
+    titleSymptom Checkertitle
+head
+body
+    h1Symptom Checkerh1
+    form action=diagnose method=post
+        h2Enter Symptomsh2
+        input type=checkbox name=symptoms value=symptom1 Symptom 1 br
+        input type=checkbox name=symptoms value=symptom2 Symptom 2 br
+        input type=checkbox name=symptoms value=symptom3 Symptom 3 br
+        !-- Add more checkboxes for symptoms as needed --
+        br
+        input type=submit value=Diagnose
+    form
+body
+html

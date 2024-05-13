@@ -3,6 +3,8 @@ import Message from "../models/Message.js";
 import { getReceiverSocketId, io } from "../middlewares/socket.js";
 import User from "../models/User.js";
 import asyncHandler from "express-async-handler"
+// import { exec } from "child_process";
+import axios from "axios";
 
 
 export const sendMessage = asyncHandler(async (req, res) => {
@@ -97,4 +99,24 @@ export const deleteConversation = asyncHandler(async (req, res) => {
 	}) // NOT REFERENCE BUT ACTUAL MESSAGES
 
 	res.status(200).json({ message: "Conversation is deleted" });
+})
+
+export const chatbot = asyncHandler(async (req, res) => {
+
+	// البيانات التي ترغب في إرسالها إلى تطبيق Flask
+
+	// إرسال طلب POST إلى تطبيق Flask
+	axios.post('http://localhost:5000/predict_symptoms', {
+		name: req.body.name,
+		disease_input: req.body.disease_input,
+		num_days: req.body.num_days,
+		syms: req.body.syms
+	})
+		.then(response => {
+			// التعامل مع الرد من تطبيق Flask
+			console.log('Prediction:', response.data.prediction);
+		})
+		.catch(error => {
+			console.error('Error:', error);
+		});
 })
