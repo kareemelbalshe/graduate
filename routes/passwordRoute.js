@@ -1,10 +1,14 @@
 import { Router } from "express";
 import { resetPasswordCtrl, sendResetPasswordCtrl } from "../controllers/passwordController.js";
 
-const router = new Router()
+const router = new Router();
 
-router.post("/reset-password-otp", sendResetPasswordCtrl)
+// Route to send reset password OTP
+// Copy right for Kareem Elbalshy kareemelbalshe1234@gmail.com
+router.post("/reset-password-otp", sendResetPasswordCtrl);
 
-router.route("/reset-password/:userId").post(resetPasswordCtrl)// to modify
+// Route to reset password
+// Copy right for Kareem Elbalshy kareemelbalshe1234@gmail.com
+router.route("/reset-password/:userId").post(resetPasswordCtrl);
 
-export default router
+export default router;

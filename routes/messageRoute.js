@@ -5,17 +5,27 @@ import { verifyToken, verifyTokenAndOnlyUser } from "../middlewares/verifyToken.
 import { isBlock } from "../middlewares/isBlock.js";
 import axios from "axios";
 
+const router = new Router();
 
-const router = new Router()
-
+// Route to get messages for a specific conversation
+// Copy right for Kareem Elbalshy kareemelbalshe1234@gmail.com
 router.get("/:id", validateObject, verifyToken, isBlock, getMessages);
+
+// Route to delete a conversation
+// Copy right for Kareem Elbalshy kareemelbalshe1234@gmail.com
 router.delete("/:id", validateObject, verifyTokenAndOnlyUser, isBlock, deleteConversation);
+
+// Route to delete a message
+// Copy right for Kareem Elbalshy kareemelbalshe1234@gmail.com
 router.delete("/:messageId", verifyTokenAndOnlyUser, isBlock, deleteMessage);
+
+// Route to send a message
+// Copy right for Kareem Elbalshy kareemelbalshe1234@gmail.com
 router.post("/send/:id", validateObject, verifyToken, isBlock, sendMessage);
 
-const FLASK_API_URL = 'http://127.0.0.1:5000'; // تأكد من تحديث هذا المسار بناءً على المسار الفعلي لتطبيق Flask
+const FLASK_API_URL = 'http://127.0.0.1:5000'; // Update this path based on the actual path of the Flask application
 
-// تعريف نقطة النهاية لتلقي البيانات من الشات بوت
+// Endpoint definition to receive data from the chatbot
 router.post('/welcome', async (req, res) => {
     try {
         const response = await axios.post(`${FLASK_API_URL}/welcome`);
@@ -65,5 +75,4 @@ router.post('/set_y_n', async (req, res) => {
     }
 });
 
-
-export default router
+export default router;

@@ -1,5 +1,6 @@
 import { Schema, model } from 'mongoose';
 
+// Define the VerificationToken schema
 const VerificationToken = new Schema({
     userId: {
         type: Schema.Types.ObjectId,
@@ -10,6 +11,7 @@ const VerificationToken = new Schema({
         type: String,
         required: true,
     },
-}, { timestamps: true })
+}, { timestamps: true });
 
-export default model('VerificationToken', VerificationToken)
+// Create a Mongoose model based on the VerificationToken schema
+export default model('VerificationToken', VerificationToken);

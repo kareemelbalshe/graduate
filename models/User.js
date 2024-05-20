@@ -3,6 +3,7 @@ import Joi from 'joi';
 import jwt from 'jsonwebtoken';
 import passwordComplexity from 'joi-password-complexity';
 
+// Define the User schema
 const User = new Schema({
     username: {
         type: String,
@@ -63,68 +64,71 @@ const User = new Schema({
     timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true }
-})
+});
 
+// Define virtual properties for related documents
 User.virtual("doctors", {
     ref: "Doctor",
     foreignField: "user",
     localField: "_id"
-})
+});
 
 User.virtual("reviews", {
     ref: "Review",
     foreignField: "doctor",
     localField: "_id"
-})
+});
 
 User.virtual("history", {
     ref: "History",
     foreignField: "user",
     localField: "_id"
-})
+});
 
+// Define a method to generate authentication tokens
 User.methods.generateAuthToken = function () {
-    return jwt.sign({ id: this._id, role: this.role }, process.env.JWT_SECRET)
-}
+    return jwt.sign({ id: this._id, role: this.role }, process.env.JWT_SECRET);
+};
 
-
+// Validation functions using Joi
 export const validateRegisterUser = function (obj) {
     const schema = Joi.object({
         username: Joi.string().trim().min(2).max(100).required(),
         email: Joi.string().trim().min(5).max(100).required().email(),
         password: passwordComplexity().required()
-    })
-    return schema.validate(obj)
-}
+    });
+    return schema.validate(obj);
+};
 
 export const validateLoginUser = function (obj) {
     const schema = Joi.object({
         email: Joi.string().trim().min(5).max(100).required().email(),
         password: Joi.string().trim().min(8).required(),
-    })
-    return schema.validate(obj)
-}
+    });
+    return schema.validate(obj);
+};
 
 export const validateUpdateUser = function (obj) {
     const schema = Joi.object({
         username: Joi.string().trim().min(2).max(100),
         password: passwordComplexity(),
-    })
-    return schema.validate(obj)
-}
+    });
+    return schema.validate(obj);
+};
 
 export const validateEmail = function (obj) {
     const schema = Joi.object({
         email: Joi.string().trim().min(5).max(100).required().email(),
-    })
-    return schema.validate(obj)
-}
+    });
+    return schema.validate(obj);
+};
 
 export const validateNewPassword = function (obj) {
     const schema = Joi.object({
         password: passwordComplexity().required(),
-    })
-    return schema.validate(obj)
-}
+    });
+    return schema.validate(obj);
+};
 
-export default model('User', User)
+// Create a Mongoose model based on the User schema
+export default model('User', User);

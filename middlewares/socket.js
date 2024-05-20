@@ -2,34 +2,39 @@ import { Server } from "socket.io";
 import http from "http";
 import express from "express";
 
-const app = express();
+const app = express(); // Initialize Express app
 
-const server = http.createServer(app);
+const server = http.createServer(app); // Create HTTP server
 const io = new Server(server, {
-	cors: ({})
+    cors: ({}) // Enable CORS with default settings
 });
 
+// Function to get the socket ID of a receiver by their user ID
 export const getReceiverSocketId = (receiverId) => {
-	return userSocketMap[receiverId];
+    return userSocketMap[receiverId];
 };
 
-const userSocketMap = {}; // {userId: socketId}
+const userSocketMap = {}; // Map to store user IDs and their corresponding socket IDs
 
+// Copy right for Kareem Elbalshy kareemelbalshe1234@gmail.com
+
+// Handle new socket connections
 io.on("connection", (socket) => {
-	console.log("a user connected", socket.id);
+    console.log("A user connected", socket.id);
 
-	const userId = socket.handshake.user.id;
-	if (userId != "undefined") userSocketMap[userId] = socket.id;
+    // Get user ID from the socket handshake data
+    const userId = socket.handshake.user.id;
+    if (userId != "undefined") userSocketMap[userId] = socket.id; // Map user ID to socket ID
 
-	// io.emit() is used to send events to all the connected clients
-	io.emit("getOnlineUsers", Object.keys(userSocketMap));
+    // Emit the list of online users to all connected clients
+    io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
-	// socket.on() is used to listen to the events. can be used both on client and server side
-	socket.on("disconnect", () => {
-		console.log("user disconnected", socket.id);
-		delete userSocketMap[userId];
-		io.emit("getOnlineUsers", Object.keys(userSocketMap));
-	});
+    // Handle socket disconnection
+    socket.on("disconnect", () => {
+        console.log("User disconnected", socket.id);
+        delete userSocketMap[userId]; // Remove user from the map
+        io.emit("getOnlineUsers", Object.keys(userSocketMap)); // Emit updated list of online users
+    });
 });
 
-export { app, io, server };
+export { app, io, server }; // Export app, io, and server for use in other modules

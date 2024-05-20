@@ -1,33 +1,46 @@
 import { Schema, model } from 'mongoose';
 
-const Booking = new Schema(
+// Define a Mongoose schema for the Booking model
+const BookingSchema = new Schema(
   {
+    // Define a reference to the doctor who receives the booking
     doctor: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "User", // Reference to the User model
       required: true,
     },
+    // Define a reference to the user who makes the booking
     user: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "User", // Reference to the User model
       required: true,
     },
+    // Define the price of the booking ticket
     ticketPrice: { type: Number, required: true },
+    // Define the status of the booking (pending, approved, cancelled)
     status: {
       type: String,
-      enum: ["pending", "approved", "cancelled"],
-      default: "pending",
+      enum: ["pending", "approved", "cancelled"], // Possible values for status
+      default: "pending", // Default status is pending
     },
+    // Define the time of the booking
     time: {
-      type: Date
+      type: Date // Date and time of the booking
     },
+    // Define the reason for cancelling the booking
     cancelReason: {
-      type: String
+      type: String // Reason for cancelling
     }
-  }, {
-  timestamps: true,
-  toJSON: { virtuals: true },
-  toObject: { virtuals: true }
-});
+  }, 
+  {
+    // Enable timestamps to automatically add createdAt and updatedAt fields
+    timestamps: true,
+    // Configure JSON serialization to include virtual properties
+    toJSON: { virtuals: true },
+    // Configure object serialization to include virtual properties
+    toObject: { virtuals: true }
+  }
+);
 
-export default model("Booking", Booking);
+// Create a Mongoose model based on the Booking schema
+export default model("Booking", BookingSchema);
