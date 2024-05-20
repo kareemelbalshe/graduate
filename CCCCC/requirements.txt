@@ -1,5 +1,0 @@
-scikit-learn~=1.4.2
-pandas~=2.2.2
-pyttsx3~=2.90
-joblib~=1.4.2
-numpy~=1.26.4
