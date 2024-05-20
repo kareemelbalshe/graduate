@@ -11,59 +11,63 @@ from sklearn.tree import DecisionTreeClassifier, _tree
 from joblib import dump
 
 # تعطيل ظهور الأخطاء
-warnings.filterwarnings("ignore")
+warnings.filterwarnings("ignore")  # Disable warnings
 
+# Load training and testing data
 training = pd.read_csv('Data/Training.csv')
 testing = pd.read_csv('Data/Testing.csv')
 cols = training.columns
-cols = cols[:-1]
+cols = cols[:-1]  # All columns except the last one
 x = training[cols]
 y = training['prognosis']
 y1 = y
 
+# Group training data by prognosis and get max value for each group
 reduced_data = training.groupby(training['prognosis']).max()
 
-# mapping S to N
+# Label encoding for target variable 'prognosis'
 le = preprocessing.LabelEncoder()
 le.fit(y)
 y = le.transform(y)
 
+# Split data into training and testing sets
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.33, random_state=42)
 testx = testing[cols]
 testy = testing['prognosis']
 testy = le.transform(testy)
 
+# Initialize and train Decision Tree Classifier
 clf1 = DecisionTreeClassifier()
 clf = clf1.fit(x_train, y_train)
 
-
+# Function to display a welcome message
 def welcome_message():
     print("\n\n\n\t\t\t\t\t\tWelcome to your DOC!")
-
 
 # Call the function to display the welcome message
 welcome_message()
 
+# Initialize dictionaries
 severityDictionary = dict()
 description_list = dict()
 precautionDictionary = dict()
-
 symptoms_dict = {}
 
+# Map symptoms to their indices
 for index, symptom in enumerate(x):
     symptoms_dict[symptom] = index
 
-
+# Function to calculate condition based on symptoms and duration
 def calc_condition(exp, days):
     sum = 0
     for item in exp:
         sum += severityDictionary.get(item, 0)
-    if ((sum * days) / (len(exp) + 1) > 13):  # endpoint
-        print("You should take the consultation from doctor. ")
+    if ((sum * days) / (len(exp) + 1) > 13):  # threshold value
+        print("You should take the consultation from doctor.")
     else:
         print("It might not be that bad but you should take precautions.")
 
-
+# Function to load symptom descriptions
 def getDescription():
     global description_list
     with open('MasterData/symptom_Description.csv') as csv_file:
@@ -73,11 +77,10 @@ def getDescription():
             _description = {row[0]: row[1]}
             description_list.update(_description)
 
-
+# Function to load symptom severity dictionary
 def getSeverityDict():
     global severityDictionary
     with open('MasterData/symptom_severity.csv') as csv_file:
-
         csv_reader = csv.reader(csv_file, delimiter=',')
         line_count = 0
         try:
@@ -87,7 +90,7 @@ def getSeverityDict():
         except:
             pass
 
-
+# Function to load symptom precaution dictionary
 def getprecautionDict():
     global precautionDictionary
     with open('MasterData/symptom_precaution.csv') as csv_file:
@@ -97,13 +100,13 @@ def getprecautionDict():
             _prec = {row[0]: [row[1], row[2], row[3], row[4]]}
             precautionDictionary.update(_prec)
 
-
+# Function to get user's name
 def getInfo():
     print("\nWhat's your Name? \t\t\t\t", end="->\t")
     name = input("")  # endpoint
     print("Hello, ", name)
 
-
+# Function to check if a pattern matches any disease name
 def check_pattern(dis_list, inp):
     pred_list = []
     inp = inp.replace(' ', '_')
@@ -115,7 +118,7 @@ def check_pattern(dis_list, inp):
     else:
         return 0, []
 
-
+# Function to make a secondary prediction
 def sec_predict(symptoms_exp):
     df = pd.read_csv('Data/Training.csv')
     X = df.iloc[:, :-1]
@@ -131,14 +134,14 @@ def sec_predict(symptoms_exp):
 
     return rf_clf.predict([input_vector])
 
-
+# Function to print the disease based on tree node value
 def print_disease(node):
     node = node[0]
     val = node.nonzero()
     disease = le.inverse_transform(val[0])
     return list(map(lambda x: x.strip(), list(disease)))
 
-
+# Function to convert decision tree to code
 def tree_to_code(tree, feature_names):
     tree_ = tree.tree_
     feature_name = [
@@ -150,9 +153,8 @@ def tree_to_code(tree, feature_names):
     symptoms_present = []
 
     while True:
-
         print("\nEnter the symptom you are experiencing  \t\t", end="->")
-        disease_input = input("")
+        disease_input = input("")# بص هنا
         conf, cnf_dis = check_pattern(chk_dis, disease_input)
         if conf == 1:
             print("searches related to input: ")
@@ -160,7 +162,7 @@ def tree_to_code(tree, feature_names):
                 print(num, ")", it)
             if num != 0:
                 print(f"Select the one you meant (0 - {num}):  ", end="")
-                conf_inp = int(input(""))
+                conf_inp = int(input("")) # بص هنا
             else:
                 conf_inp = 0
 
@@ -171,7 +173,7 @@ def tree_to_code(tree, feature_names):
 
     while True:
         try:
-            num_days = int(input("Okay. From how many days ? : "))
+            num_days = int(input("Okay. From how many days ? : "))# بص هنا
             break
         except:
             print("Enter valid input.")
@@ -202,7 +204,7 @@ def tree_to_code(tree, feature_names):
                 inp = ""
 
                 while True:
-                    inp = input("")
+                    inp = input("")# بص هنا
                     if (
                             inp == "yes" or inp == "Yes" or inp == "True" or inp == "true" or inp == "t" or inp == "y" or inp == "Y" or inp == "no" or inp == "No" or inp == "no" or inp == "n" or inp == "N"):
                         break
@@ -230,15 +232,18 @@ def tree_to_code(tree, feature_names):
 
     recurse(0, 1)
 
-
+# Load data from CSV files into dictionaries
 getSeverityDict()
 getDescription()
 getprecautionDict()
+
+# Get user info
 getInfo()
+
+# Convert the decision tree to code and interact with user to diagnose
 tree_to_code(clf, cols)
 
 print("--------------------------------------Thank You--------------------------------------------------")
 
-
-
+# Save the model to a file
 joblib.dump(tree_to_code, 'model11.pk1')

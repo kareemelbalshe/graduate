@@ -11,6 +11,7 @@ import { app, server } from "./middlewares/socket.js"
 import xss from 'xss-clean'
 import hpp from "hpp"
 import helmet from "helmet"
+import bodyParser from 'body-parser'
 dotenv.config()
 
 //copy right for kareem Elbalshy kareemelbalshe1234@gmail.com
@@ -18,6 +19,8 @@ dotenv.config()
 //https://graduate-wgus.onrender.com/
 
 app.use(express.json())
+
+app.use(bodyParser.json());
 
 app.use(helmet())
 
@@ -39,9 +42,6 @@ app.use("/api/password", passwordRoute)
 app.use(notFound)
 app.use(errorHandler)
 
-app.get('/test',(req,res)=>{
-    res.json({message:"ok"})
-})
 
 server.listen(process.env.PORT, () => {
     connectDB()
