@@ -31,7 +31,7 @@ const BookingSchema = new Schema(
     cancelReason: {
       type: String // Reason for cancelling
     }
-  }, 
+  },
   {
     // Enable timestamps to automatically add createdAt and updatedAt fields
     timestamps: true,

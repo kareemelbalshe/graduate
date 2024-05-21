@@ -14,7 +14,7 @@ export const notFound = (req, res, next) => {
 export const errorHandler = (err, req, res, next) => {
     // Determine the status code; use 500 if the status code is 200
     const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
-    
+
     // Set the response status to the determined status code
     res.status(statusCode).json({
         // Send the error message

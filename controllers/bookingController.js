@@ -15,7 +15,7 @@ export const getCheckoutSession = asyncHandler(async (req, res) => {
             ticketPrice: doctor.ticketPrice,
             status: "pending"
         })
-        booking.save()
+        await booking.save()
         await Doctor.findOneAndUpdate({ user: req.params.id }, {
             $push: {
                 booking: booking._id

@@ -22,7 +22,7 @@ export const sendMessage = asyncHandler(async (req, res) => {
 			conversation = await Conversation.create({
 				participants: [senderId, receiverId],
 			});
-			
+
 			// Add receiverId to sender's ChatList and vice versa
 			await User.findByIdAndUpdate(senderId, {
 				$push: {

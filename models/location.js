@@ -9,7 +9,7 @@ const LocationSchema = new mongoose.Schema({
   // Longitude coordinate of the location
   longitude: Number,
   // Time slots associated with the location
-  timeSlots: [{ 
+  timeSlots: [{
     // Each time slot contains day, from, and to properties
     day: { type: String }, // Day of the week
     from: { type: String }, // Start time
