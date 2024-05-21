@@ -24,7 +24,7 @@ router.delete("/:messageId", verifyTokenAndOnlyUser, isBlock, deleteMessage);
 // Copy right for Kareem Elbalshy kareemelbalshe1234@gmail.com
 router.post("/send/:id", validateObject, verifyToken, isBlock, sendMessage);
 
-const FLASK_API_URL = 'http://127.0.0.1:5000'; // Update this path based on the actual path of the Flask application
+const FLASK_API_URL = 'https://chat-bot-0fy8.onrender.com'||'http://127.0.0.1:5000'; // Update this path based on the actual path of the Flask application
 
 // Endpoint definition to receive data from the chatbot
 router.post('/welcome', verifyToken, async (req, res) => {
