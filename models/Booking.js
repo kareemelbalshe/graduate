@@ -16,7 +16,7 @@ const BookingSchema = new Schema(
       required: true,
     },
     // Define the price of the booking ticket
-    ticketPrice: { type: Number, required: true },
+    ticketPrice: { type: Number },
     // Define the status of the booking (pending, approved, cancelled)
     status: {
       type: String,
