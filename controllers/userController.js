@@ -167,24 +167,27 @@ export const createReport = asyncHandler(async (req, res) => {
 
 // Controller to get all reports
 export const getAllReports = asyncHandler(async (req, res) => {
-    const report = await Report.find();
+    const reports = await Report.find();
     let resp = [];
 
-    await Promise.all(report.map(async (v) => {
+    await Promise.all(reports.map(async (v) => {
         let kind = v.kind;
         let response;
 
         if (kind === "user") {
-            response = await User.findById(v.about).populate("-password -wishlist -ChatList -Reservations");
+            response = await User.findById(v.about).select('-password -wishlist -ChatList -Reservations');
         } else if (kind === "message") {
-            response = await Message.findById(v.about).populate("senderId", "-password -wishlist -ChatList -Reservations")
-                .populate("receiverId", "-password -wishlist -ChatList -Reservations");
+            response = await Message.findById(v.about)
+                .populate({ path: 'senderId', select: '-password -wishlist -ChatList -Reservations' })
+                .populate({ path: 'receiverId', select: '-password -wishlist -ChatList -Reservations' });
         } else if (kind === "history") {
-            response = await History.findById(v.about).populate("user", "-password -wishlist -ChatList -Reservations")
-                .populate("doctor", "-password -wishlist -ChatList -Reservations");
+            response = await History.findById(v.about)
+                .populate({ path: 'user', select: '-password -wishlist -ChatList -Reservations' })
+                .populate({ path: 'doctor', select: '-password -wishlist -ChatList -Reservations' });
         } else if (kind === "review") {
-            response = await Review.findById(v.about).populate("user", "-password -wishlist -ChatList -Reservations")
-                .populate("doctor", "-password -wishlist -ChatList -Reservations");
+            response = await Review.findById(v.about)
+                .populate({ path: 'user', select: '-password -wishlist -ChatList -Reservations' })
+                .populate({ path: 'doctor', select: '-password -wishlist -ChatList -Reservations' });
         }
 
         resp.push({ response, description: v.description });
@@ -192,8 +195,6 @@ export const getAllReports = asyncHandler(async (req, res) => {
 
     res.status(200).json({ data: resp });
 });
-
-
 export const deleteReport = asyncHandler(async (req, res) => {
     await Report.findByIdAndDelete(req.params.reportId)
 
