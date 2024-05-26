@@ -56,7 +56,7 @@ export const approvedBooking = asyncHandler(async (req, res) => {
             time: req.body.time,
             cancelReason: ""
         }
-    }).populate("user", "-password -wishlist -ChatList").populate("doctor", "-password -wishlist -ChatList").select("doctors").sort({ createdAt: -1 })
+    }).populate("user", "-password -wishlist -ChatList").populate("doctor", "-password -wishlist -ChatList").sort({ createdAt: -1 })
     res.status(200).json({ success: true, message: 'Successfully approved', data: book })
 })
 
@@ -68,13 +68,13 @@ export const cancelledBooking = asyncHandler(async (req, res) => {
             cancelReason: req.body.reason,
             time: ""
         }
-    }).populate("user", "-password -wishlist -ChatList").populate("doctor", "-password -wishlist -ChatList").select("doctors").sort({ createdAt: -1 })
+    }).populate("user", "-password -wishlist -ChatList").populate("doctor", "-password -wishlist -ChatList").sort({ createdAt: -1 })
     res.status(200).json({ success: true, message: 'Successfully cancelled', data: book })
 })
 
 // Endpoint to get all bookings
 export const getAllBooking = asyncHandler(async (req, res) => {
-    const booking = await Booking.find().populate("user", "-password -wishlist -ChatList").populate("doctor", "-password -wishlist -ChatList").select("doctors").sort({ createdAt: -1 })
+    const booking = await Booking.find().populate("user", "-password -wishlist -ChatList").populate("doctor", "-password -wishlist -ChatList").sort({ createdAt: -1 })
     res.status(200).json({ success: true, booking })
 })
 
