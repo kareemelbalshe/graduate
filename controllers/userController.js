@@ -16,6 +16,9 @@ import Location from "../models/location.js"; // Importing the Location model
 // Controller to get all users with role 'patient'
 export const getAllUsersCtrl = asyncHandler(async (req, res) => {
     const users = await User.find({ role: 'patient' }).select("-password -wishlist -ChatList -Reservations");
+    if (users.length === 0) {
+        return res.status(400).json({ message: "No users found" });
+    }
     res.status(200).json(users);
 });
 
@@ -140,14 +143,17 @@ export const UserBeDoctor = asyncHandler(async (req, res) => {
 export const makeBlock = asyncHandler(async (req, res) => {
     // Find user by ID
     const user = await User.findById(req.params.id);
+    if (!user) {
+        return res.status(404).json({ message: "user not found" });
+    }
     // Toggle user's block status
     if (user.isBlocked === false) {
         user.isBlocked = true;
-        user.save();
+        await user.save();
         res.status(201).json({ message: "user blocked" });
     } else {
         user.isBlocked = false;
-        user.save();
+        await user.save();
         res.status(201).json({ message: "user unblocked" });
     }
 });
@@ -192,6 +198,9 @@ export const getAllReports = asyncHandler(async (req, res) => {
 
         resp.push({ response, description: v.description });
     }));
+    if (resp.length === 0) {
+        return res.status(404).json({ message: "no reports found" });
+    }
 
     res.status(200).json({ data: resp });
 });

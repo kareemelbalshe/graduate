@@ -7,6 +7,9 @@ import asyncHandler from "express-async-handler"
 // Endpoint to get all doctors
 export const getAllDoctors = asyncHandler(async (req, res) => {
     const doctors = await User.find({ role: 'doctor' }).populate("doctors", "-likes").select("-password -wishlist -ChatList -Reservations")
+    if (doctors.length === 0) {
+        return res.status(404).json({ message: "No doctors found" })
+    }
     res.status(200).json(doctors)
 })
 
@@ -67,6 +70,7 @@ export const toggleLikeCtrl = asyncHandler(async (req, res) => {
 // Endpoint to get the list of users who liked a doctor
 export const getLikeList = asyncHandler(async (req, res) => {
     const doctor = await Doctor.findOne({ user: req.params.id })
+    if (!doctor) { return res.status(404).json({ message: "Doctor not found" }) }
     const users = doctor.likes
     const likeList = await User.find({ _id: { $in: users } }).select("-password -Reservations").select("-wishlist").select("-ChatList")
     res.status(200).json(likeList)
@@ -75,6 +79,7 @@ export const getLikeList = asyncHandler(async (req, res) => {
 // Endpoint to get the wishlist of a user
 export const getWishList = asyncHandler(async (req, res) => {
     const user = await User.findById(req.params.id)
+    if (!user) { return res.status(404).json({ message: "User not found" }) }
     const doctors = user.wishlist
     const wishList = await User.find({ _id: { $in: doctors } }).select("-password -Reservations").select("-likes").select("-ChatList")
     res.status(200).json(wishList)
@@ -83,6 +88,7 @@ export const getWishList = asyncHandler(async (req, res) => {
 // Endpoint to get the chat list of a user
 export const getChatList = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user.id)
+    if (!user) { return res.status(404).json({ message: "User not found" }) }
     const chat = user.ChatList
     const ChatList = await User.find({ _id: { $in: chat } }).select("-password").select("-likes").select("-wishlist")
     res.status(200).json(ChatList)
@@ -186,7 +192,6 @@ export const getDoctor = asyncHandler(async (req, res) => {
             .sort({ totalRating: -1, averageRating: -1, likes: -1 })
             .populate("user", "-password -wishlist -ChatList -Reservations").select("-reviews")
     }
-
 
     res.status(200).json(doctor)
 })

@@ -105,11 +105,16 @@ export const deleteMessage = asyncHandler(async (req, res) => {
 export const deleteConversation = asyncHandler(async (req, res) => {
 	const { id: userToChatId } = req.params;
 	const senderId = req.user.id;
-
-	// Find and delete conversation between sender and userToChatId
-	await Conversation.findOneAndDelete({
+	const user = await User.findById(senderId);
+	const conversation = await Conversation.findOne({
 		participants: { $all: [senderId, userToChatId] },
 	});
+	user.ChatList.map(async (c) => {
+		// Find and delete conversation between sender and userToChatId
+		if (c.id === conversation.id) {
+			user.ChatList.splice(user.ChatList.indexOf(c), 1);
+		}
+	});	
 
 	// Respond with success message
 	res.status(200).json({ message: "Conversation is deleted" });

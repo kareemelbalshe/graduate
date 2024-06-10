@@ -62,6 +62,9 @@ export const getAllHistory = asyncHandler(async (req, res) => {
             .populate("user", "-password -wishlist -ChatList -Reservations")
             .populate("doctor", "-password -wishlist -ChatList -Reservations")
     }
+    if (!history) {
+        return res.status(404).json({ message: 'history not found' })
+    }
     // Send the history entries as a response
     res.status(200).json(history)
 })
@@ -71,6 +74,9 @@ export const getUserHistory = asyncHandler(async (req, res) => {
     // Find history entries associated with the current user
     const history = await History.find({ user: req.user.id }).populate("doctor", "-likes -reviews -booking")
 
+    if (!history) {
+        return res.status(404).json({ message: 'history not found' })
+    }
     // Send the user's history entries as a response
     res.status(200).json(history)
 })

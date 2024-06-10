@@ -9,6 +9,9 @@ import asyncHandler from "express-async-handler"
 export const getCheckoutSession = asyncHandler(async (req, res) => {
     try {
         const doctor = await Doctor.findOne({ user: req.params.id })
+        if (!doctor) {
+            return res.status(404).json({ success: false, message: 'Doctor not found' })
+        }
         const booking = new Booking({
             doctor: req.params.id,
             user: req.user.id,
@@ -35,6 +38,9 @@ export const getCheckoutSession = asyncHandler(async (req, res) => {
 // Endpoint to get bookings related to a doctor
 export const getBookingToDoctor = asyncHandler(async (req, res) => {
     const doctor = await Doctor.findOne({ user: req.user.id })
+    if (!doctor) {
+        return res.status(404).json({ success: false, message: 'Doctor not found' })
+    }
     const book = doctor.booking
     const booking = await Booking.find({ _id: { $in: book } }).populate("user", "-password -wishlist -ChatList -Reservations")
     res.status(200).json(booking)
@@ -43,6 +49,9 @@ export const getBookingToDoctor = asyncHandler(async (req, res) => {
 // Endpoint to get bookings related to a patient
 export const getBookingToPatient = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user.id)
+    if (!user) {
+        return res.status(404).json({ success: false, message: 'User not found' })
+    }
     const book = user.Reservations
     const reservations = await Booking.find({ _id: { $in: book } }).populate("doctor", "-password -wishlist -ChatList -Reservations")
     res.status(200).json(reservations)
@@ -75,6 +84,9 @@ export const cancelledBooking = asyncHandler(async (req, res) => {
 // Endpoint to get all bookings
 export const getAllBooking = asyncHandler(async (req, res) => {
     const booking = await Booking.find().populate("user", "-password -wishlist -ChatList").populate("doctor", "-password -wishlist -ChatList").sort({ createdAt: -1 })
+    if (!booking) {
+        return res.status(404).json({ success: false, message: 'No booking found' })
+    }
     res.status(200).json({ success: true, booking })
 })
 
