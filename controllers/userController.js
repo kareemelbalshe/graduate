@@ -24,7 +24,7 @@ export const getAllUsersCtrl = asyncHandler(async (req, res) => {
 
 // Controller to get user profile by ID
 export const getUserProfileCtrl = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.params.id).select("-password -wishlist -ChatList -Reservations").populate("history").populate("doctors");
+    const user = await User.findById(req.params.id).select("-password -wishlist -ChatList -Reservations").populate("history").populate("doctors location");
     if (!user) {
         return res.status(404).json({ message: "user not found" });
     }
