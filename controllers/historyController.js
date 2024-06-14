@@ -162,6 +162,10 @@ export const updateHistoryPhoto = asyncHandler(async (req, res) => {
     if (!history) {
         return res.status(404).json({ message: 'history not found' })
     }
+    // Check if the requester is authorized to update the history entry
+    if (req.user.id !== history.doctor.toString()) {
+        return res.status(403).json({ message: 'access denied,you are not allowed' })
+    }
 
     // Remove the existing image associated with the history entry from Cloudinary
     await cloudinaryRemoveImage(history.image.publicId)
