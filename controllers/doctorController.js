@@ -98,6 +98,7 @@ export const getChatList = asyncHandler(async (req, res) => {
 export const searchAboutPatient = asyncHandler(async (req, res) => {
     let patient
     const username = req.body.username,
+        email = req.body.email,
         id = req.body.id
     if (username) {
         patient = await User.find({
@@ -108,8 +109,13 @@ export const searchAboutPatient = asyncHandler(async (req, res) => {
             }
         }).select("-password -wishlist -ChatList -Reservations")
     } else if (id) {
-        patient = await User.find({
-            role: "patient", _id: req?.body.id,
+        patient = await User.findOne({
+            role: "patient", _id: id,
+        }).select("-password -wishlist -ChatList -Reservations")
+    }
+    else if (email) {
+        patient = await User.findOne({
+            role: "patient", email: email,
         }).select("-password -wishlist -ChatList -Reservations")
     }
     res.status(200).json(patient)

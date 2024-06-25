@@ -121,7 +121,7 @@ export const deleteConversation = asyncHandler(async (req, res) => {
 		if (c.id === conversation.id) {
 			user.ChatList.splice(user.ChatList.indexOf(c), 1);
 		}
-	});	
+	});
 
 	// Respond with success message
 	res.status(200).json({ message: "Conversation is deleted" });

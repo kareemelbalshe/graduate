@@ -58,7 +58,7 @@ export const getAllHistory = asyncHandler(async (req, res) => {
     // Otherwise, get all history entries
     else {
         history = await History.find()
-            .sort({createdAt: -1 })
+            .sort({ createdAt: -1 })
             .populate("user", "-password -wishlist -ChatList -Reservations")
             .populate("doctor", "-password -wishlist -ChatList -Reservations")
     }

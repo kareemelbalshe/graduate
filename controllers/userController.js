@@ -71,8 +71,7 @@ export const profilePhotoUploadCtrl = asyncHandler(async (req, res) => {
         publicId: result.public_id
     };
     await user.save();
-    // Remove temporary image file
-    fs.unlinkSync(imagePath);
+
     // Respond with success message and uploaded photo data
     res.status(200).json({
         message: "your profile photo uploaded successfully",
@@ -81,6 +80,8 @@ export const profilePhotoUploadCtrl = asyncHandler(async (req, res) => {
             publicId: result.public_id
         }
     });
+    // Remove temporary image file
+    fs.unlinkSync(imagePath);
 });
 
 // Controller to delete user profile
@@ -128,14 +129,14 @@ export const askToBeDoctor = asyncHandler(async (req, res) => {
     const result = await cloudinaryUploadImage(imagePath)
 
     await BeDoctor.create({
-        userId: user._id,
+        email: req.body.email,
         image: {
             url: result.secure_url,
             publicId: result.public_id
         }
     })
 
-    res.status(200).json({message: "we sent your application to be a doctor"})
+    res.status(200).json({ message: "we sent your application to be a doctor" })
     fs.unlinkSync(imagePath)
 });
 

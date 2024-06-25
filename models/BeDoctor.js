@@ -1,13 +1,13 @@
 import { Schema, model } from 'mongoose';
 
 const BeDoctorSchema = new Schema({
-    userId: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
+    email: {
+        type: String,
         required: true,
     },
     image: {
         type: Object,
+        required: true,
         default: {
             url: "",
             publicId: null,
