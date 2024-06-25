@@ -44,7 +44,7 @@ const User = new Schema({
         type: String,
     },
     wishlist: [{ type: Schema.Types.ObjectId, ref: "User" }],
-    ChatList: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    ChatList: [{ type: Schema.Types.ObjectId, ref: "Conversation" }],
     role: {
         type: String,
         enum: ["patient", "admin", "doctor"],

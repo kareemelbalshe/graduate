@@ -1,5 +1,6 @@
 // Copy right for Kareem Elbalshy kareemelbalshe1234@gmail.com
 
+import Conversation from "../models/Conversation.js"
 import Doctor from "../models/Doctor.js"
 import User from "../models/User.js"
 import asyncHandler from "express-async-handler"
@@ -90,7 +91,7 @@ export const getChatList = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user.id)
     if (!user) { return res.status(404).json({ message: "User not found" }) }
     const chat = user.ChatList
-    const ChatList = await User.find({ _id: { $in: chat } }).select("-password").select("-likes").select("-wishlist").sort({ updatedAt: -1 })
+    const ChatList = await Conversation.find({ _id: { $in: chat } }).populate("participants", "-password -wishlist -ChatList -Reservations").sort({ updatedAt: -1 })
     res.status(200).json(ChatList)
 })
 

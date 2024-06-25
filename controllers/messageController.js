@@ -26,12 +26,12 @@ export const sendMessage = asyncHandler(async (req, res) => {
 			// Add receiverId to sender's ChatList and vice versa
 			await User.findByIdAndUpdate(senderId, {
 				$push: {
-					ChatList: receiverId
+					ChatList: conversation._id
 				}
 			});
 			await User.findByIdAndUpdate(receiverId, {
 				$push: {
-					ChatList: senderId
+					ChatList: conversation._id
 				}
 			});
 		}
@@ -47,13 +47,6 @@ export const sendMessage = asyncHandler(async (req, res) => {
 		if (newMessage) {
 			conversation.messages.push(newMessage._id);
 		}
-
-		await User.findByIdAndUpdate(senderId, {
-			isAccountVerified: true
-		});
-		await User.findByIdAndUpdate(receiverId, {
-			isAccountVerified: true
-		});
 
 		// Save conversation and message asynchronously
 		await Promise.all([conversation.save(), newMessage.save()]);
@@ -84,7 +77,7 @@ export const getMessages = asyncHandler(async (req, res) => {
 		}).populate("messages");
 
 		// If conversation doesn't exist, return empty array
-		if (!conversation) return res.status(200).json([]);
+		if (!conversation) return res.status(200).json({messages:"no conversation found"});
 
 		// Extract messages from conversation and fetch sender and receiver details
 		const messages = conversation.messages;
