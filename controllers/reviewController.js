@@ -7,7 +7,7 @@ export const getAllReviews = asyncHandler(async (req, res) => {
     try {
         // Find all reviews and populate user and doctor fields
         const reviews = await Review.find().populate("user", "-password -wishlist -ChatList -Reservations")
-            .populate("doctor", "-password -wishlist -ChatList -Reservations");
+            .populate("doctor", "-password -wishlist -ChatList -Reservations").sort({ createdAt: -1 });
 
         // Respond with success message and data
         res.status(200).json({ success: true, message: "successful", data: reviews });
@@ -20,7 +20,7 @@ export const getAllReviews = asyncHandler(async (req, res) => {
 // Controller to get reviews of a specific doctor
 export const getDoctorReviews = asyncHandler(async (req, res) => {
     // Find reviews for the doctor specified in the request
-    const reviews = await Review.find({ doctor: req.user.id }).populate("user", "-password -wishlist -ChatList -Reservations");
+    const reviews = await Review.find({ doctor: req.user.id }).populate("user", "-password -wishlist -ChatList -Reservations").sort({ createdAt: -1 });
     // Respond with success message and data
     res.status(200).json({ success: true, message: "successful", data: reviews });
 });
@@ -64,7 +64,7 @@ export const createReview = asyncHandler(async (req, res) => {
 export const updateReviewCtrl = asyncHandler(async (req, res) => {
     const id = req.params.id;
     // Find the review by ID
-    const review = await Review.findById(req.body.reviewId);
+    const review = await Review.findById(req.params.reviewId);
     if (!review) {
         // If review not found, respond with error message
         return res.status(404).json({ message: "review not found" });

@@ -58,7 +58,7 @@ export const getAllHistory = asyncHandler(async (req, res) => {
     // Otherwise, get all history entries
     else {
         history = await History.find()
-            .sort({ date: -1, createdAt: -1 })
+            .sort({createdAt: -1 })
             .populate("user", "-password -wishlist -ChatList -Reservations")
             .populate("doctor", "-password -wishlist -ChatList -Reservations")
     }
@@ -72,7 +72,7 @@ export const getAllHistory = asyncHandler(async (req, res) => {
 // Controller function to get history entries of a specific user
 export const getUserHistory = asyncHandler(async (req, res) => {
     // Find history entries associated with the current user
-    const history = await History.find({ user: req.user.id }).populate("doctor", "-likes -reviews -booking")
+    const history = await History.find({ user: req.user.id }).populate("doctor", "-likes -reviews -booking").sort({ createdAt: -1 })
 
     if (!history) {
         return res.status(404).json({ message: 'history not found' })

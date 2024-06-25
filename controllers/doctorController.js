@@ -6,7 +6,7 @@ import asyncHandler from "express-async-handler"
 
 // Endpoint to get all doctors
 export const getAllDoctors = asyncHandler(async (req, res) => {
-    const doctors = await User.find({ role: 'doctor' }).populate("doctors", "-likes").select("-password -wishlist -ChatList -Reservations")
+    const doctors = await User.find({ role: 'doctor' }).populate("doctors", "-likes").select("-password -wishlist -ChatList -Reservations").sort({ createdAt: -1 })
     if (doctors.length === 0) {
         return res.status(404).json({ message: "No doctors found" })
     }

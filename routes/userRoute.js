@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { UserBeDoctor, askToBeDoctor, createReport, deleteReport, deleteUserProfileCtrl, getAllReports, getAllUsersCtrl, getUserProfileCtrl, makeBlock, profilePhotoUploadCtrl, updateUserProfileCtrl } from "../controllers/userController.js";
+import { UserBeDoctor, askToBeDoctor, createReport, deleteReport, deleteUserProfileCtrl, getAllReports, getAllUsersCtrl, getApplications, getUserProfileCtrl, makeBlock, profilePhotoUploadCtrl, updateUserProfileCtrl } from "../controllers/userController.js";
 import { verifyDoctor, verifyToken, verifyTokenAndAdmin, verifyTokenAndAuthorization, verifyTokenAndOnlyUser } from "../middlewares/verifyToken.js";
 import validateObject from "../middlewares/validateObject.js";
 import { photoUpload } from "../middlewares/photoUpload.js";
@@ -22,6 +22,7 @@ router.get("/admin/dashboard/search-doctor", verifyTokenAndAdmin, searchAboutDoc
 router.get("/admin/dashboard/review", verifyTokenAndAdmin, getAllReviews);
 router.get("/admin/dashboard/booking", verifyTokenAndAdmin, getAllBooking);
 router.get("/admin/dashboard/report", verifyTokenAndAdmin, getAllReports);
+router.get("/admin/dashboard/applications", verifyTokenAndAdmin, getApplications);
 
 router.route('/:id/makeDoctor').post(validateObject, verifyTokenAndAdmin, UserBeDoctor);
 router.route("/block/:id").post(verifyTokenAndAdmin, makeBlock);
@@ -79,10 +80,10 @@ router.route("/profile/:id/history")
     .get(validateObject, verifyToken, isBlock, getUserHistory);
 router.route("/profile/history/:historyId")
     .get(verifyToken, isBlock, getSingleHistory)
-    .delete(verifyTokenAndAuthorization, isBlock, deleteHistory)
+    .delete(verifyToken, isBlock, deleteHistory)
     .post(verifyDoctor, isBlock, updateHistory);
 router.route("/profile/history/update-image/:historyId")
-    .put(verifyTokenAndOnlyUser, isBlock, photoUpload.single("image"), updateHistoryPhoto);
+    .put(verifyToken, isBlock, photoUpload.single("image"), updateHistoryPhoto);
 
 // Report routes
 router.route("/:id/report").post(validateObject, verifyToken, isBlock, createReport);
