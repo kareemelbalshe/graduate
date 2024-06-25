@@ -48,6 +48,13 @@ export const sendMessage = asyncHandler(async (req, res) => {
 			conversation.messages.push(newMessage._id);
 		}
 
+		await User.findByIdAndUpdate(senderId, {
+			isAccountVerified: true
+		});
+		await User.findByIdAndUpdate(receiverId, {
+			isAccountVerified: true
+		});
+
 		// Save conversation and message asynchronously
 		await Promise.all([conversation.save(), newMessage.save()]);
 
