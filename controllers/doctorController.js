@@ -29,7 +29,7 @@ export const updateDoctor = asyncHandler(async (req, res) => {
     if (!user) {
         return res.status(404).json({ message: "User not found" })
     }
-    res.status(201).json({ message: "Doctor updated successfully" }, user)
+    res.status(201).json({ message: "Doctor updated successfully", user })
 })
 
 // Endpoint to toggle like for a doctor
@@ -51,7 +51,7 @@ export const toggleLikeCtrl = asyncHandler(async (req, res) => {
                 wishlist: req.params.id
             }
         })
-        res.status(200).json({ success: false, message: "Doctor removed from wishlist" })
+        res.status(200).json({ success: false })
     } else {
         await Doctor.findOneAndUpdate({ user: req.params.id }, {
             $push: {
@@ -63,7 +63,7 @@ export const toggleLikeCtrl = asyncHandler(async (req, res) => {
                 wishlist: req.params.id
             }
         })
-        res.status(200).json({ success: true, message: "Doctor added to wishlist" })
+        res.status(200).json({ success: true })
     }
 })
 

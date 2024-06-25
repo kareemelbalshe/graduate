@@ -127,7 +127,7 @@ export const askToBeDoctor = asyncHandler(async (req, res) => {
     // Upload the image to Cloudinary
     const result = await cloudinaryUploadImage(imagePath)
 
-    const back = await BeDoctor.create({
+    await BeDoctor.create({
         userId: user._id,
         image: {
             url: result.secure_url,
@@ -135,8 +135,16 @@ export const askToBeDoctor = asyncHandler(async (req, res) => {
         }
     })
 
-    res.status(200).json(back)
+    res.status(200).json({message: "we sent your application to be a doctor"})
     fs.unlinkSync(imagePath)
+});
+
+export const getApplications = asyncHandler(async (req, res) => {
+    const applications = await BeDoctor.find().populate("userId", "-password -wishlist -ChatList -Reservations").sort({ createdAt: -1 })
+    if (applications.length === 0) {
+        return res.status(404).json({ message: "no applications found" });
+    }
+    res.status(200).json(applications)
 });
 
 // Controller to convert user to doctor
@@ -144,7 +152,23 @@ export const UserBeDoctor = asyncHandler(async (req, res) => {
     // Find user by ID
     let user = await User.findById(req.params.id);
     if (user.role === "doctor") {
-        res.status(500).json({ message: "user is already doctor" });
+        user = await User.findByIdAndUpdate(req.params.id, {
+            $set: {
+                role: "patient"
+            }
+        });
+        // Generate authentication token
+        const token = user.generateAuthToken();
+        // Create doctor profile for the user
+        await Doctor.findOneAndDelete({ user: req.params.id });
+        // Respond with success message and user data
+        res.status(200).json({
+            photo: user.photo,
+            token,
+            username: user.username,
+            _id: user._id,
+            role: user.role,
+        });
     }
     // Update user role to doctor
     user = await User.findByIdAndUpdate(req.params.id, {

@@ -10,7 +10,7 @@ export const getAllReviews = asyncHandler(async (req, res) => {
             .populate("doctor", "-password -wishlist -ChatList -Reservations");
 
         // Respond with success message and data
-        res.status(200).json({ success: true, message: "successful" }, reviews)
+        res.status(200).json({ success: true, message: "successful", data: reviews });
     } catch (error) {
         // Handle error response
         res.status(404).json({ success: false, message: "Not found", data: error.message });
@@ -22,7 +22,7 @@ export const getDoctorReviews = asyncHandler(async (req, res) => {
     // Find reviews for the doctor specified in the request
     const reviews = await Review.find({ doctor: req.user.id }).populate("user", "-password -wishlist -ChatList -Reservations");
     // Respond with success message and data
-    res.status(200).json({ success: true, message: "successful" }, reviews)
+    res.status(200).json({ success: true, message: "successful", data: reviews });
 });
 
 // Controller to create a new review
@@ -53,7 +53,7 @@ export const createReview = asyncHandler(async (req, res) => {
             averageRating: avg
         });
         // Respond with success message and data
-        res.status(200).json({ success: true, message: "Review submitted" }, savedReview)
+        res.status(200).json({ success: true, message: "Review submitted", data: savedReview });
     } else {
         // If user has already reviewed, respond with error message
         res.status(500).json({ success: false, message: "you already reviewed" });
