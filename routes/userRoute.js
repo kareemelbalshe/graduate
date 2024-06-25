@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { UserBeDoctor, createReport, deleteReport, deleteUserProfileCtrl, getAllReports, getAllUsersCtrl, getUserProfileCtrl, makeBlock, profilePhotoUploadCtrl, updateUserProfileCtrl } from "../controllers/userController.js";
+import { UserBeDoctor, askToBeDoctor, createReport, deleteReport, deleteUserProfileCtrl, getAllReports, getAllUsersCtrl, getUserProfileCtrl, makeBlock, profilePhotoUploadCtrl, updateUserProfileCtrl } from "../controllers/userController.js";
 import { verifyDoctor, verifyToken, verifyTokenAndAdmin, verifyTokenAndAuthorization, verifyTokenAndOnlyUser } from "../middlewares/verifyToken.js";
 import validateObject from "../middlewares/validateObject.js";
 import { photoUpload } from "../middlewares/photoUpload.js";
@@ -25,6 +25,8 @@ router.get("/admin/dashboard/report", verifyTokenAndAdmin, getAllReports);
 
 router.route('/:id/makeDoctor').post(validateObject, verifyTokenAndAdmin, UserBeDoctor);
 router.route("/block/:id").post(verifyTokenAndAdmin, makeBlock);
+
+router.route('/askToBeDoctor').post(verifyToken, askToBeDoctor);
 
 
 // User routes

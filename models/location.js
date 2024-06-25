@@ -8,6 +8,8 @@ const LocationSchema = new mongoose.Schema({
   latitude: Number,
   // Longitude coordinate of the location
   longitude: Number,
+  // Address of the location
+  address: { type: String, required: true },
   // Time slots associated with the location
   timeSlots: [{
     // Each time slot contains day, from, and to properties

@@ -113,7 +113,7 @@ export const deleteHistory = asyncHandler(async (req, res) => {
         await History.findByIdAndDelete(req.params.historyId)
 
         // Send a success message as a response
-        res.status(200).json({ message: "history has been deleted successfully", historyId: history._id })
+        res.status(200).json({ message: "history has been deleted successfully" })
     }
     else {
         // If requester is not authorized, return a 403 response

@@ -12,6 +12,7 @@ import History from "../models/History.js"; // Importing the History model
 import Report from "../models/report.js"; // Importing the Report model
 import Message from "../models/Message.js"; // Importing the Message model
 import Location from "../models/location.js"; // Importing the Location model
+import BeDoctor from "../models/BeDoctor.js";
 
 // Controller to get all users with role 'patient'
 export const getAllUsersCtrl = asyncHandler(async (req, res) => {
@@ -109,6 +110,33 @@ export const deleteUserProfileCtrl = asyncHandler(async (req, res) => {
     await User.findByIdAndDelete(req.params.id);
     // Respond with success message
     res.status(200).json({ message: "your profile has been deleted" });
+});
+
+export const askToBeDoctor = asyncHandler(async (req, res) => {
+    // Find user by ID
+    let user = await User.findById(req.user.id);
+    if (user.role === "doctor") {
+        res.status(500).json({ message: "user is already doctor" });
+    }
+    if (!req.file) {
+        return res.status(400).json({ message: "no image provided" })
+    }
+
+    // Get the file path of the uploaded image
+    const imagePath = path.join(__dirname, `../images/${req.file.filename}`)
+    // Upload the image to Cloudinary
+    const result = await cloudinaryUploadImage(imagePath)
+
+    const back = await BeDoctor.create({
+        userId: user._id,
+        image: {
+            url: result.secure_url,
+            publicId: result.public_id
+        }
+    })
+
+    res.status(200).json(back)
+    fs.unlinkSync(imagePath)
 });
 
 // Controller to convert user to doctor

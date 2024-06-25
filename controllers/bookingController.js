@@ -29,7 +29,7 @@ export const getCheckoutSession = asyncHandler(async (req, res) => {
                 Reservations: booking._id
             }
         })
-        res.status(200).json({ success: true, message: 'Successfully booked', booking })
+        res.status(200).json({ success: true, message: 'Successfully booked' }, booking)
     } catch (error) {
         res.status(500).json({ success: false, message: 'Error creating booking' })
     }
@@ -66,7 +66,7 @@ export const approvedBooking = asyncHandler(async (req, res) => {
             cancelReason: ""
         }
     }).populate("user", "-password -wishlist -ChatList").populate("doctor", "-password -wishlist -ChatList").sort({ createdAt: -1 })
-    res.status(200).json({ success: true, message: 'Successfully approved', data: book })
+    res.status(200).json({ success: true, message: 'Successfully approved' }, book)
 })
 
 // Endpoint to cancel a booking
@@ -78,7 +78,7 @@ export const cancelledBooking = asyncHandler(async (req, res) => {
             time: ""
         }
     }).populate("user", "-password -wishlist -ChatList").populate("doctor", "-password -wishlist -ChatList").sort({ createdAt: -1 })
-    res.status(200).json({ success: true, message: 'Successfully cancelled', data: book })
+    res.status(200).json({ success: true, message: 'Successfully cancelled' }, book)
 })
 
 // Endpoint to get all bookings
@@ -87,7 +87,7 @@ export const getAllBooking = asyncHandler(async (req, res) => {
     if (!booking) {
         return res.status(404).json({ success: false, message: 'No booking found' })
     }
-    res.status(200).json({ success: true, booking })
+    res.status(200).json(booking)
 })
 
 // Endpoint to delete a booking

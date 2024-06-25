@@ -10,6 +10,7 @@ export const createLocation = asyncHandler(async (req, res) => {
         userId: req.params.id,
         latitude,
         longitude,
+        address: req.body.address,
         timeSlots: req.body.timeSlots // Assuming timeSlots is an array of time slots
     });
 
