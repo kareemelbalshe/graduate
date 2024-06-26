@@ -58,6 +58,7 @@ export const getCheckoutSessionClinic = asyncHandler(async (req, res) => {
         res.status(500).json({ success: false, message: 'Error creating booking' })
     }
 })
+
 export const getCheckoutSessionHome = asyncHandler(async (req, res) => {
     try {
         const doctor = await Doctor.findOne({ user: req.params.id })
@@ -76,7 +77,6 @@ export const getCheckoutSessionHome = asyncHandler(async (req, res) => {
         })
 
         booking.ticketPrice = doctor.ticketPriceHome
-        booking.time = req.body.time
 
         await booking.save()
         await Doctor.findOneAndUpdate({ user: req.params.id }, {
@@ -136,12 +136,25 @@ export const getBookingToPatient = asyncHandler(async (req, res) => {
 
 // Endpoint to approve a booking
 export const approvedBooking = asyncHandler(async (req, res) => {
-    const book = await Booking.findByIdAndUpdate(req.params.bookingId, {
-        $set: {
-            status: "approved",
-            cancelReason: ""
-        }
-    }).populate("user", "-password -wishlist -ChatList").populate("doctor", "-password -wishlist -ChatList").sort({ createdAt: -1 })
+    
+    const book = await Booking.findById(req.params.bookingId)
+    if (book.kind==="clinic") {
+        await Booking.findByIdAndUpdate(req.params.bookingId, {
+            $set: {
+                status: "approved",
+                cancelReason: ""
+            }
+        }).populate("user", "-password -wishlist -ChatList").populate("doctor", "-password -wishlist -ChatList").sort({ createdAt: -1 })
+    }
+    else {
+        await Booking.findByIdAndUpdate(req.params.bookingId, {
+            $set: {
+                status: "approved",
+                cancelReason: "",
+                time: req.body.time
+            }
+        }).populate("user", "-password -wishlist -ChatList").populate("doctor", "-password -wishlist -ChatList").sort({ createdAt: -1 })
+    }
     res.status(200).json({ success: true, message: 'Successfully approved', data: book })
 })
 
