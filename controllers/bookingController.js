@@ -136,10 +136,10 @@ export const getBookingToPatient = asyncHandler(async (req, res) => {
 
 // Endpoint to approve a booking
 export const approvedBooking = asyncHandler(async (req, res) => {
-    
-    const book = await Booking.findById(req.params.bookingId)
-    if (book.kind==="clinic") {
-        await Booking.findByIdAndUpdate(req.params.bookingId, {
+
+    let book = await Booking.findById(req.params.bookingId)
+    if (book.kind === "clinic") {
+        book = await Booking.findByIdAndUpdate(req.params.bookingId, {
             $set: {
                 status: "approved",
                 cancelReason: ""
@@ -147,7 +147,7 @@ export const approvedBooking = asyncHandler(async (req, res) => {
         }).populate("user", "-password -wishlist -ChatList").populate("doctor", "-password -wishlist -ChatList").sort({ createdAt: -1 })
     }
     else {
-        await Booking.findByIdAndUpdate(req.params.bookingId, {
+        book = await Booking.findByIdAndUpdate(req.params.bookingId, {
             $set: {
                 status: "approved",
                 cancelReason: "",
