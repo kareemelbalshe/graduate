@@ -18,7 +18,6 @@ export const getCheckoutSessionClinic = asyncHandler(async (req, res) => {
             doctor: req.params.id,
             user: req.user.id,
             status: "pending",
-            kind: req.body.kind,
             toPerson: req.body.toPerson,
             complaining: req.body.complaining,
             age: req.body.age
@@ -70,7 +69,7 @@ export const getCheckoutSessionHome = asyncHandler(async (req, res) => {
             doctor: req.params.id,
             user: req.user.id,
             status: "pending",
-            kind: req.body.kind,
+            kind: "home",
             toPerson: req.body.toPerson,
             complaining: req.body.complaining,
             age: req.body.age
