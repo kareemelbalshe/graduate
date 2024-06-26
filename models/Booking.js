@@ -19,6 +19,7 @@ const BookingSchema = new Schema(
     clinic: { type: Schema.Types.ObjectId, ref: "Location" },
     toPerson: { type: String },
     complaining: { type: String },
+    age:String,
     // Define the price of the booking ticket
     ticketPrice: { type: Number },
     // Define the status of the booking (pending, approved, cancelled)

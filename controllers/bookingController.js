@@ -7,7 +7,7 @@ import asyncHandler from "express-async-handler"
 import Location from '../models/location.js'
 
 // Endpoint to create a new booking
-export const getCheckoutSession = asyncHandler(async (req, res) => {
+export const getCheckoutSessionClinic = asyncHandler(async (req, res) => {
     try {
         const doctor = await Doctor.findOne({ user: req.params.id })
         if (!doctor) {
@@ -20,11 +20,13 @@ export const getCheckoutSession = asyncHandler(async (req, res) => {
             status: "pending",
             kind: req.body.kind,
             toPerson: req.body.toPerson,
-            complaining: req.body.complaining
+            complaining: req.body.complaining,
+            age: req.body.age
         })
-        if (req.body.kind === "clinic") {
-            const clinic = await Location.findOne({ _id: req.params.locationId, userId: req.params.id })
-            clinic.timeSlots.forEach(async (time) => {
+        const timeSlot = req.body.timeSlots
+        const clinic = await Location.findOne({ _id: req.params.locationId, userId: req.params.id })
+        clinic.timeSlots.map(async (time) => {
+            if (time.id === timeSlot.id) {
                 if (time.taken === true) {
                     return res.status(400).json({ success: false, message: 'Time is already taken' })
                 }
@@ -34,14 +36,48 @@ export const getCheckoutSession = asyncHandler(async (req, res) => {
                 booking.time.to = time.to
                 time.taken = true
                 await clinic.save()
-            })
-            booking.ticketPrice = doctor.ticketPriceClinic
-            booking.clinic = clinic._id
+            }
+        })
+        booking.ticketPrice = doctor.ticketPriceClinic
+        booking.clinic = clinic._id
+
+        await booking.save()
+        await Doctor.findOneAndUpdate({ user: req.params.id }, {
+            $push: {
+                booking: booking._id
+            }
+        })
+        await User.findByIdAndUpdate(req.user.id, {
+            $push: {
+                Reservations: booking._id
+            }
+        })
+        deleteOldBookings();
+        res.status(200).json({ success: true, message: 'Successfully booked', booking: booking })
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Error creating booking' })
+    }
+})
+export const getCheckoutSessionHome = asyncHandler(async (req, res) => {
+    try {
+        const doctor = await Doctor.findOne({ user: req.params.id })
+        if (!doctor) {
+            return res.status(404).json({ success: false, message: 'Doctor not found' })
         }
-        else {
-            booking.ticketPrice = doctor.ticketPriceHome
-            booking.time = req.body.time
-        }
+
+        const booking = new Booking({
+            doctor: req.params.id,
+            user: req.user.id,
+            status: "pending",
+            kind: req.body.kind,
+            toPerson: req.body.toPerson,
+            complaining: req.body.complaining,
+            age: req.body.age
+        })
+
+        booking.ticketPrice = doctor.ticketPriceHome
+        booking.time = req.body.time
+
         await booking.save()
         await Doctor.findOneAndUpdate({ user: req.params.id }, {
             $push: {

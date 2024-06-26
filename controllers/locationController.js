@@ -85,10 +85,10 @@ export const updateTimeSlot = asyncHandler(async (req, res) => {
     }
     const timeSlot = req.params.timeSlotId
     location.timeSlots.map(async (slot) => {
-        if (slot.id === timeSlot.id) {
-            slot.day = timeSlot.day
-            slot.from = timeSlot.from
-            slot.to = timeSlot.to
+        if (slot.id === timeSlot) {
+            slot.day = req.body.day
+            slot.from = req.body.from
+            slot.to = req.body.to
         }
     })
     await location.save()

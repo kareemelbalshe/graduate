@@ -6,7 +6,7 @@ import { photoUpload } from "../middlewares/photoUpload.js";
 import { isBlock } from "../middlewares/isBlock.js";
 import { getChatList, getAllDoctors, getLikeList, getWishList, toggleLikeCtrl, updateDoctor, popularDoctor, newDoctor, getDoctor, searchAboutPatient, searchAboutDoctor } from "../controllers/doctorController.js";
 import { createHistory, deleteHistory, getAllHistory, getSingleHistory, getUserHistory, updateHistory, updateHistoryPhoto } from "../controllers/historyController.js";
-import { approvedBooking, cancelledBooking, deleteBooking, getAllBooking, getBookingToDoctor, getBookingToPatient, getCheckoutSession } from "../controllers/bookingController.js";
+import { approvedBooking, cancelledBooking, deleteBooking, getAllBooking, getBookingToDoctor, getBookingToPatient, getCheckoutSessionClinic, getCheckoutSessionHome } from "../controllers/bookingController.js";
 import { createReview, deleteReview, getAllReviews, getDoctorReviews, updateReviewCtrl } from "../controllers/reviewController.js";
 import { createLocation, deleteLocation, deleteTimeSlot, getAllLocations, getLocation, getLocations, setTimeSlot, updateLocation, updateTimeSlot } from "../controllers/locationController.js";
 
@@ -42,7 +42,8 @@ router.route("/profile/profile-photo-upload")
     .post(verifyToken, isBlock, photoUpload.single("image"), profilePhotoUploadCtrl);
 
 // Booking routes
-router.post('/:id/booking/:locationId', validateObject, verifyToken, isBlock, getCheckoutSession);
+router.post('/:id/booking/:locationId', validateObject, verifyToken, isBlock, getCheckoutSessionClinic);
+router.post('/:id/booking', validateObject, verifyToken, isBlock, getCheckoutSessionHome);
 router.post('/booking-approve/:bookingId', verifyDoctor, isBlock, approvedBooking);
 router.post('/booking-cancel/:bookingId', verifyToken, isBlock, cancelledBooking);
 router.delete('/booking/:bookingId', verifyToken, isBlock, deleteBooking);
