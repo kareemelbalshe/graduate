@@ -26,7 +26,7 @@ export const getCheckoutSessionClinic = asyncHandler(async (req, res) => {
         const timeSlot = req.body.timeSlots
         const clinic = await Location.findOne({ _id: req.params.locationId, userId: req.params.id })
         clinic.timeSlots.map(async (time) => {
-            if (time.id === timeSlot.id) {
+            if (time.id === timeSlot) {
                 if (time.taken === true) {
                     return res.status(400).json({ success: false, message: 'Time is already taken' })
                 }
