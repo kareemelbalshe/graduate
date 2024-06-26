@@ -28,6 +28,7 @@ export const getCheckoutSession = asyncHandler(async (req, res) => {
                 if(time.taken===true){
                     return res.status(400).json({ success: false, message: 'Time is already taken' })
                 }
+                booking.time.id = time.id
                 booking.time.day = time.day
                 booking.time.from = time.from
                 booking.time.to = time.to

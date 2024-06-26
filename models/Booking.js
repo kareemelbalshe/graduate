@@ -29,6 +29,7 @@ const BookingSchema = new Schema(
     },
     // Define the time of the booking
     time: {
+      id: String, // Id of the time slot
       day: { type: String }, // Day of the week
       from: { type: String }, // Start time
       to: { type: String }, // End time // Date and time of the booking

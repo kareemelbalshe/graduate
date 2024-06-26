@@ -1,6 +1,7 @@
 import asyncHandler from "express-async-handler"
 import Location from "../models/location.js";
 import Doctor from "../models/Doctor.js";
+import Booking from "../models/Booking.js";
 
 // Controller for creating a new location
 export const createLocation = asyncHandler(async (req, res) => {
@@ -101,6 +102,9 @@ export const deleteTimeSlot = asyncHandler(async (req, res) => {
         return res.status(404).json({ message: "Location not found" })
     }
     const timeSlot = req.params.timeSlotId
+
+    await Booking.findOneAndDelete({ time: { id: timeSlot } })
+
     location.timeSlots.splice(location.timeSlots.indexOf(timeSlot), 1)
     await location.save()
 
