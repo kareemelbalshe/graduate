@@ -8,6 +8,7 @@ const Doctor = new Schema({
         ref: "User", // Reference to the User model
         required: true,
     },
+    clinic: [{ type: Schema.Types.ObjectId, ref: "Location" }],
     // Specialization of the doctor
     specialization: {
         type: String,
@@ -45,7 +46,8 @@ const Doctor = new Schema({
         enum: ["Intern", "Resident", "Specialist", "SeniorSpecialist", "Consultant", "SeniorConsultant", "Professor"]
     },
     // Price of the doctor's consultation ticket
-    ticketPrice: { type: Number },
+    ticketPriceClinic: { type: Number },
+    ticketPriceHome: { type: Number },
     // Hospital where the doctor works
     hospital: { type: String },
     // Users who liked the doctor

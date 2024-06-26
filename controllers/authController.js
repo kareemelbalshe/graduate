@@ -33,7 +33,8 @@ export const registerUserCtrl = asyncHandler(async (req, res) => {
         email: req.body.email,
         password: hashPassword,
         birthday: req.body.birthday,
-        gender: req.body.gender
+        gender: req.body.gender,
+        phone: req.body.phone
     });
     await user.save();
 

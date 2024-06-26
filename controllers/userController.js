@@ -119,25 +119,13 @@ export const askToBeDoctor = asyncHandler(async (req, res) => {
     if (user.role === "doctor") {
         res.status(500).json({ message: "user is already doctor" });
     }
-    if (!req.file) {
-        return res.status(400).json({ message: "no image provided" })
-    }
-
-    // Get the file path of the uploaded image
-    const imagePath = path.join(__dirname, `../images/${req.file.filename}`)
-    // Upload the image to Cloudinary
-    const result = await cloudinaryUploadImage(imagePath)
 
     await BeDoctor.create({
+        userId: req.user.id,
         email: req.body.email,
-        image: {
-            url: result.secure_url,
-            publicId: result.public_id
-        }
     })
 
     res.status(200).json({ message: "we sent your application to be a doctor" })
-    fs.unlinkSync(imagePath)
 });
 
 export const getApplications = asyncHandler(async (req, res) => {

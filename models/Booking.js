@@ -15,6 +15,10 @@ const BookingSchema = new Schema(
       ref: "User", // Reference to the User model
       required: true,
     },
+    kind: { type: String, enum: ["home", "clinic"], required: true, default: "clinic" },
+    clinic: { type: Schema.Types.ObjectId, ref: "Location" },
+    toPerson: { type: String },
+    complaining: { type: String },
     // Define the price of the booking ticket
     ticketPrice: { type: Number },
     // Define the status of the booking (pending, approved, cancelled)
@@ -25,7 +29,9 @@ const BookingSchema = new Schema(
     },
     // Define the time of the booking
     time: {
-      type: Date // Date and time of the booking
+      day: { type: String }, // Day of the week
+      from: { type: String }, // Start time
+      to: { type: String }, // End time // Date and time of the booking
     },
     // Define the reason for cancelling the booking
     cancelReason: {

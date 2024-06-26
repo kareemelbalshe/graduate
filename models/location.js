@@ -12,10 +12,13 @@ const LocationSchema = new mongoose.Schema({
   address: { type: String, required: true },
   // Time slots associated with the location
   timeSlots: [{
+    id: { type: String },
+    taken: { type: Boolean, default: false },
     // Each time slot contains day, from, and to properties
     day: { type: String }, // Day of the week
     from: { type: String }, // Start time
     to: { type: String }, // End time
+    date: { type: Date, default: Date.now } // Store the full date and time, default to current time
   }],
 }, {
   // Enable timestamps to automatically add createdAt and updatedAt fields

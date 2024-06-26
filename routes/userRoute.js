@@ -8,7 +8,7 @@ import { getChatList, getAllDoctors, getLikeList, getWishList, toggleLikeCtrl, u
 import { createHistory, deleteHistory, getAllHistory, getSingleHistory, getUserHistory, updateHistory, updateHistoryPhoto } from "../controllers/historyController.js";
 import { approvedBooking, cancelledBooking, deleteBooking, getAllBooking, getBookingToDoctor, getBookingToPatient, getCheckoutSession } from "../controllers/bookingController.js";
 import { createReview, deleteReview, getAllReviews, getDoctorReviews, updateReviewCtrl } from "../controllers/reviewController.js";
-import { createLocation, deleteLocation, getAllLocations, getLocations } from "../controllers/locationController.js";
+import { createLocation, deleteLocation, deleteTimeSlot, getAllLocations, getLocation, getLocations, setTimeSlot, updateLocation, updateTimeSlot } from "../controllers/locationController.js";
 
 const router = new Router();
 
@@ -42,7 +42,7 @@ router.route("/profile/profile-photo-upload")
     .post(verifyToken, isBlock, photoUpload.single("image"), profilePhotoUploadCtrl);
 
 // Booking routes
-router.post('/:id/booking', validateObject, verifyToken, isBlock, getCheckoutSession);
+router.post('/:id/booking/:locationId', validateObject, verifyToken, isBlock, getCheckoutSession);
 router.post('/booking-approve/:bookingId', verifyDoctor, isBlock, approvedBooking);
 router.post('/booking-cancel/:bookingId', verifyToken, isBlock, cancelledBooking);
 router.delete('/booking/:bookingId', verifyToken, isBlock, deleteBooking);
@@ -72,7 +72,13 @@ router.route('/profile/:id/location')
     .post(validateObject, verifyDoctor, isBlock, createLocation)
     .get(validateObject, verifyToken, isBlock, getAllLocations);
 router.route('/profile/:id/location/:locationId')
+    .get(validateObject, verifyToken, isBlock, getLocation)
+    .post(validateObject, verifyDoctor, isBlock, updateLocation)
+    .put(validateObject, verifyDoctor, isBlock, setTimeSlot)
     .delete(validateObject, verifyTokenAndAuthorization, deleteLocation);
+router.route('/profile/:id/location/:locationId/time-slot/:timeSlotId')
+    .put(validateObject, verifyDoctor, isBlock, updateTimeSlot)
+    .delete(validateObject, verifyDoctor, isBlock, deleteTimeSlot);
 
 // History routes
 router.route("/profile/:id/history")

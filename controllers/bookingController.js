@@ -4,6 +4,7 @@ import Doctor from '../models/Doctor.js'
 import User from '../models/User.js'
 import Booking from '../models/Booking.js'
 import asyncHandler from "express-async-handler"
+import Location from '../models/location.js'
 
 // Endpoint to create a new booking
 export const getCheckoutSession = asyncHandler(async (req, res) => {
@@ -12,12 +13,34 @@ export const getCheckoutSession = asyncHandler(async (req, res) => {
         if (!doctor) {
             return res.status(404).json({ success: false, message: 'Doctor not found' })
         }
+
         const booking = new Booking({
             doctor: req.params.id,
             user: req.user.id,
-            ticketPrice: doctor.ticketPrice,
-            status: "pending"
+            status: "pending",
+            kind: req.body.kind,
+            toPerson: req.body.toPerson,
+            complaining: req.body.complaining
         })
+        if (req.body.kind === "clinic") {
+            const clinic = await Location.findOne({ _id: req.params.locationId,userId: req.params.id })
+            clinic.timeSlots.forEach( async (time)=> {
+                if(time.taken===true){
+                    return res.status(400).json({ success: false, message: 'Time is already taken' })
+                }
+                booking.time.day = time.day
+                booking.time.from = time.from
+                booking.time.to = time.to
+                time.taken = true
+                await clinic.save()
+            })
+            booking.ticketPrice = doctor.ticketPriceClinic
+            booking.clinic = clinic._id
+        }
+        else {
+            booking.ticketPrice = doctor.ticketPriceHome
+            booking.time = req.body.time
+        }
         await booking.save()
         await Doctor.findOneAndUpdate({ user: req.params.id }, {
             $push: {
@@ -29,11 +52,28 @@ export const getCheckoutSession = asyncHandler(async (req, res) => {
                 Reservations: booking._id
             }
         })
+        deleteOldBookings();
         res.status(200).json({ success: true, message: 'Successfully booked', booking })
     } catch (error) {
         res.status(500).json({ success: false, message: 'Error creating booking' })
     }
 })
+
+const deleteOldBookings = async () => {
+    try {
+      // Calculate the date one week ago from now
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+  
+      // Delete bookings older than one week
+      const result = await Booking.deleteMany({ createdAt: { $lt: oneWeekAgo } });
+  
+      console.log(`Deleted ${result.deletedCount} outdated bookings.`);
+    } catch (error) {
+      console.error('Error deleting outdated bookings:', error);
+    }
+  };
+  
 
 // Endpoint to get bookings related to a doctor
 export const getBookingToDoctor = asyncHandler(async (req, res) => {
@@ -62,7 +102,6 @@ export const approvedBooking = asyncHandler(async (req, res) => {
     const book = await Booking.findByIdAndUpdate(req.params.bookingId, {
         $set: {
             status: "approved",
-            time: req.body.time,
             cancelReason: ""
         }
     }).populate("user", "-password -wishlist -ChatList").populate("doctor", "-password -wishlist -ChatList").sort({ createdAt: -1 })

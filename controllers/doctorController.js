@@ -21,7 +21,8 @@ export const updateDoctor = asyncHandler(async (req, res) => {
             specialization: req.body.specialization,
             bio: req.body.bio,
             degree: req.body.degree,
-            ticketPrice: req.body.ticketPrice,
+            ticketPriceClinic: req.body.ticketPriceClinic,
+            ticketPriceHome: req.body.ticketPriceHome,
             experiences: req.body.experiences,
             hospital: req.body.hospital
         },
