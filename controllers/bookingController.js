@@ -23,9 +23,9 @@ export const getCheckoutSession = asyncHandler(async (req, res) => {
             complaining: req.body.complaining
         })
         if (req.body.kind === "clinic") {
-            const clinic = await Location.findOne({ _id: req.params.locationId,userId: req.params.id })
-            clinic.timeSlots.forEach( async (time)=> {
-                if(time.taken===true){
+            const clinic = await Location.findOne({ _id: req.params.locationId, userId: req.params.id })
+            clinic.timeSlots.forEach(async (time) => {
+                if (time.taken === true) {
                     return res.status(400).json({ success: false, message: 'Time is already taken' })
                 }
                 booking.time.id = time.id
@@ -54,7 +54,7 @@ export const getCheckoutSession = asyncHandler(async (req, res) => {
             }
         })
         deleteOldBookings();
-        res.status(200).json({ success: true, message: 'Successfully booked', booking })
+        res.status(200).json({ success: true, message: 'Successfully booked', booking: booking })
     } catch (error) {
         res.status(500).json({ success: false, message: 'Error creating booking' })
     }
@@ -62,19 +62,19 @@ export const getCheckoutSession = asyncHandler(async (req, res) => {
 
 const deleteOldBookings = async () => {
     try {
-      // Calculate the date one week ago from now
-      const oneWeekAgo = new Date();
-      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-  
-      // Delete bookings older than one week
-      const result = await Booking.deleteMany({ createdAt: { $lt: oneWeekAgo } });
-  
-      console.log(`Deleted ${result.deletedCount} outdated bookings.`);
+        // Calculate the date one week ago from now
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+        // Delete bookings older than one week
+        const result = await Booking.deleteMany({ createdAt: { $lt: oneWeekAgo } });
+
+        console.log(`Deleted ${result.deletedCount} outdated bookings.`);
     } catch (error) {
-      console.error('Error deleting outdated bookings:', error);
+        console.error('Error deleting outdated bookings:', error);
     }
-  };
-  
+};
+
 
 // Endpoint to get bookings related to a doctor
 export const getBookingToDoctor = asyncHandler(async (req, res) => {
@@ -127,7 +127,7 @@ export const getAllBooking = asyncHandler(async (req, res) => {
     if (!booking) {
         return res.status(404).json({ success: false, message: 'No booking found' })
     }
-    res.status(200).json({ success: true, booking })
+    res.status(200).json({ success: true, booking: booking })
 })
 
 // Endpoint to delete a booking

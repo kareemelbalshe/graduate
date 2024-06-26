@@ -31,7 +31,7 @@ export const updateDoctor = asyncHandler(async (req, res) => {
     if (!user) {
         return res.status(404).json({ message: "User not found" })
     }
-    res.status(201).json({ message: "Doctor updated successfully", user })
+    res.status(201).json({ message: "Doctor updated successfully", user: user })
 })
 
 // Endpoint to toggle like for a doctor
