@@ -164,7 +164,7 @@ export const getAllLocations = asyncHandler(async (req, res) => {
     const userId = req.params.id;
 
     // Find all locations associated with the user ID
-    const locations = await Location.find({ userId: userId }).populate("user", "-password -wishlist -ChatList -Reservations");
+    const locations = await Location.find({ userId: userId }).populate("userId", "-password -wishlist -ChatList -Reservations").sort({ createdAt: -1 });
 
     // Respond with the retrieved locations
     res.json(locations);
