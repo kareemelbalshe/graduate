@@ -29,7 +29,6 @@ router.route("/block/:id").post(verifyTokenAndAdmin, makeBlock);
 
 router.route('/askToBeDoctor').post(verifyToken, askToBeDoctor);
 
-
 // User routes
 // Copy right for Kareem Elbalshy kareemelbalshe1234@gmail.com
 router.route("/profile/:id")
