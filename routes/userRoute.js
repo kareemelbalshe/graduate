@@ -8,7 +8,7 @@ import { getChatList, getAllDoctors, getLikeList, getWishList, toggleLikeCtrl, u
 import { createHistory, deleteHistory, getAllHistory, getSingleHistory, getUserHistory, updateHistory, updateHistoryPhoto } from "../controllers/historyController.js";
 import { approvedBooking, cancelledBooking, deleteBooking, getAllBooking, getBookingToDoctor, getBookingToPatient, getCheckoutSessionClinic, getCheckoutSessionHome } from "../controllers/bookingController.js";
 import { createReview, deleteReview, getAllReviews, getDoctorReviews, updateReviewCtrl } from "../controllers/reviewController.js";
-import { createLocation, deleteLocation, deleteTimeSlot, getAllLocations, getLocation, getLocations, setTimeSlot, updateLocation, updateTimeSlot } from "../controllers/locationController.js";
+import { createLocation, deleteLocation, deleteTime, deleteTimeSlot, getAllLocations, getLocation, getLocations, setTime, setTimeSlot, updateLocation, updateTimeSlot } from "../controllers/locationController.js";
 
 const router = new Router();
 
@@ -76,10 +76,13 @@ router.route('/profile/:id/location/:locationId')
     .get(validateObject, verifyToken, isBlock, getLocation)
     .post(validateObject, verifyDoctor, isBlock, updateLocation)
     .put(validateObject, verifyDoctor, isBlock, setTimeSlot)
+    .patch(validateObject, verifyDoctor, isBlock, setTime)
     .delete(validateObject, verifyTokenAndAuthorization, deleteLocation);
 router.route('/profile/:id/location/:locationId/time-slot/:timeSlotId')
     .put(validateObject, verifyDoctor, isBlock, updateTimeSlot)
     .delete(validateObject, verifyDoctor, isBlock, deleteTimeSlot);
+router.route('/profile/:id/location/:locationId/time-slot/:timeId')
+    .delete(validateObject, verifyDoctor, isBlock, deleteTime);
 
 // History routes
 router.route("/profile/:id/history")

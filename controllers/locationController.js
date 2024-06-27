@@ -88,12 +88,16 @@ export const setTimeSlot = asyncHandler(async (req, res) => {
         var randomIndex = Math.floor(Math.random() * charset.length);
         id += charset[randomIndex];
     }
-    const timeId = req.body.time
-    const day = location.time.map(async (time) => {
+    const timeId = req.body.time;
+    let day = null;
+
+    await Promise.all(location.time.map(async (time) => {
         if (time.id === timeId) {
-            return time.day
+            day = time.day;
         }
-    })
+    }));
+
+
     const timeSlot = {
         id: id,
         day: day,
@@ -113,13 +117,13 @@ export const updateTimeSlot = asyncHandler(async (req, res) => {
         return res.status(404).json({ message: "Location not found" })
     }
     const timeSlot = req.params.timeSlotId
-    location.timeSlots.map(async (slot) => {
+    await Promise.all(location.timeSlots.map(async (slot) => {
         if (slot.id === timeSlot) {
             slot.from = req.body.from
             slot.to = req.body.to
             slot.date = Date.now()
         }
-    })
+    }))
     await location.save()
 
     res.status(200).json(location)
