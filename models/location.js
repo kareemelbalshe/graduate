@@ -11,6 +11,15 @@ const LocationSchema = new mongoose.Schema({
   // Address of the location
   address: { type: String, required: true },
   // Time slots associated with the location
+  time: [
+    {
+      id: { type: String },
+      // Each time slot contains day, from, and to properties
+      day: { type: String }, // Day of the week
+      from: { type: String }, // Start time
+      to: { type: String }, // End time
+    }
+  ],
   timeSlots: [{
     id: { type: String },
     taken: { type: Boolean, default: false },

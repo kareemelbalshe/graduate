@@ -1,5 +1,5 @@
 // Copy right for Kareem Elbalshy kareemelbalshe1234@gmail.com
-
+import cron from 'node-cron';
 import Doctor from '../models/Doctor.js'
 import User from '../models/User.js'
 import Booking from '../models/Booking.js'
@@ -34,6 +34,7 @@ export const getCheckoutSessionClinic = asyncHandler(async (req, res) => {
                 booking.time.from = time.from
                 booking.time.to = time.to
                 time.taken = true
+                time.date = Date.now()
                 await clinic.save()
             }
         })
@@ -51,7 +52,6 @@ export const getCheckoutSessionClinic = asyncHandler(async (req, res) => {
                 Reservations: booking._id
             }
         })
-        deleteOldBookings();
         res.status(200).json({ success: true, message: 'Successfully booked', booking: booking })
     } catch (error) {
         res.status(500).json({ success: false, message: 'Error creating booking' })
@@ -88,14 +88,13 @@ export const getCheckoutSessionHome = asyncHandler(async (req, res) => {
                 Reservations: booking._id
             }
         })
-        deleteOldBookings();
         res.status(200).json({ success: true, message: 'Successfully booked', booking: booking })
     } catch (error) {
         res.status(500).json({ success: false, message: 'Error creating booking' })
     }
 })
 
-const deleteOldBookings = async () => {
+cron.schedule('0 0 * * *', async () => {
     try {
         // Calculate the date one week ago from now
         const oneWeekAgo = new Date();
@@ -108,7 +107,7 @@ const deleteOldBookings = async () => {
     } catch (error) {
         console.error('Error deleting outdated bookings:', error);
     }
-};
+});
 
 
 // Endpoint to get bookings related to a doctor

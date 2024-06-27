@@ -2,6 +2,7 @@ import asyncHandler from "express-async-handler"
 import Location from "../models/location.js";
 import Doctor from "../models/Doctor.js";
 import Booking from "../models/Booking.js";
+import cron from 'node-cron';
 
 // Controller for creating a new location
 export const createLocation = asyncHandler(async (req, res) => {
@@ -53,6 +54,29 @@ export const getLocation = asyncHandler(async (req, res) => {
     res.status(200).json(location)
 })
 
+export const setTime = asyncHandler(async (req, res) => {
+    const location = await Location.findById(req.params.locationId)
+    if (!location) {
+        return res.status(404).json({ message: "Location not found" })
+    }
+    var charset = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    var id = "";
+    for (var i = 0; i < 10; i++) {
+        var randomIndex = Math.floor(Math.random() * charset.length);
+        id += charset[randomIndex];
+    }
+    const time = {
+        id: id,
+        day: req.body.day,
+        from: req.body.from,
+        to: req.body.to,
+    }
+    location.time.push(time)
+    await location.save()
+
+    res.status(200).json(location)
+})
+
 export const setTimeSlot = asyncHandler(async (req, res) => {
     const location = await Location.findById(req.params.locationId)
     if (!location) {
@@ -64,9 +88,15 @@ export const setTimeSlot = asyncHandler(async (req, res) => {
         var randomIndex = Math.floor(Math.random() * charset.length);
         id += charset[randomIndex];
     }
+    const timeId = req.body.time
+    const day = location.time.map(async (time) => {
+        if (time.id === timeId) {
+            return time.day
+        }
+    })
     const timeSlot = {
         id: id,
-        day: req.body.day,
+        day: day,
         from: req.body.from,
         to: req.body.to,
         date: Date.now()
@@ -74,7 +104,6 @@ export const setTimeSlot = asyncHandler(async (req, res) => {
     location.timeSlots.push(timeSlot)
     await location.save()
 
-    deleteOldTimeSlots();
     res.status(200).json(location)
 })
 
@@ -86,11 +115,26 @@ export const updateTimeSlot = asyncHandler(async (req, res) => {
     const timeSlot = req.params.timeSlotId
     location.timeSlots.map(async (slot) => {
         if (slot.id === timeSlot) {
-            slot.day = req.body.day
             slot.from = req.body.from
             slot.to = req.body.to
+            slot.date = Date.now()
         }
     })
+    await location.save()
+
+    res.status(200).json(location)
+})
+
+export const deleteTime = asyncHandler(async (req, res) => {
+    const location = await Location.findById(req.params.locationId)
+    if (!location) {
+        return res.status(404).json({ message: "Location not found" })
+    }
+    const time = req.params.timeId
+
+    await Booking.findOneAndDelete({ time: { id: time } })
+
+    location.time.splice(location.time.indexOf(time), 1)
     await location.save()
 
     res.status(200).json(location)
@@ -142,25 +186,45 @@ export const deleteLocation = asyncHandler(async (req, res) => {
     res.json({ message: 'Location deleted' });
 })
 
-const deleteOldTimeSlots = async () => {
+cron.schedule('0 0 * * *', async () => {
     try {
-        // Calculate the date one week ago from now
-        const oneWeekAgo = new Date();
-        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-
-        // Find locations with time slots older than one week and remove those time slots
-        const locations = await Location.find({
-            'timeSlots.date': { $lt: oneWeekAgo }
-        });
-
+        const locations = await Location.find();
+        const now = new Date();
         for (const location of locations) {
-            location.timeSlots = location.timeSlots.filter(slot => slot.createdAt >= oneWeekAgo);
+            location.timeSlots.forEach(slot => {
+                const slotDate = new Date(slot.date);
+                const oneDayAfter = new Date(slotDate.getTime() + 24 * 60 * 60 * 1000);
+                if (now > oneDayAfter) {
+                    slot.taken = false;
+                }
+            });
             await location.save();
         }
-
-        console.log('Old time slots deleted successfully.');
+        console.log('Updated timeSlots successfully.');
     } catch (error) {
-        console.error('Error deleting old time slots:', error);
+        console.error('Error updating timeSlots:', error);
     }
-};
+});
+
+// const deleteOldTimeSlots = async () => {
+//     try {
+//         // Calculate the date one week ago from now
+//         const oneWeekAgo = new Date();
+//         oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+//         // Find locations with time slots older than one week and remove those time slots
+//         const locations = await Location.find({
+//             'timeSlots.date': { $lt: oneWeekAgo }
+//         });
+
+//         for (const location of locations) {
+//             location.timeSlots = location.timeSlots.filter(slot => slot.createdAt >= oneWeekAgo);
+//             await location.save();
+//         }
+
+//         console.log('Old time slots deleted successfully.');
+//     } catch (error) {
+//         console.error('Error deleting old time slots:', error);
+//     }
+// };
 
