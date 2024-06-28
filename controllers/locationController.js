@@ -210,6 +210,26 @@ cron.schedule('0 0 * * *', async () => {
     }
 });
 
+cron.schedule('0 0 * * *', async () => {
+    try {
+        const locations = await Location.find();
+        const now = new Date();
+        for (const location of locations) {
+            location.timeSlots.forEach(slot => {
+                const slotDate = new Date(slot.date);
+                const twoDayAfter = new Date(slotDate.getTime() + 2 * 24 * 60 * 60 * 1000);
+                if (now > twoDayAfter) {
+                    slot.date = Date.now();
+                }
+            });
+            await location.save();
+        }
+        console.log('Updated successfully.');
+    } catch (error) {
+        console.error('Error updating timeSlots:', error);
+    }
+});
+
 // const deleteOldTimeSlots = async () => {
 //     try {
 //         // Calculate the date one week ago from now

@@ -43,9 +43,9 @@ export const createReview = asyncHandler(async (req, res) => {
         // Update doctor's total and average rating
         const stats = await Review.find({ doctor: id });
         let avg = 0;
-        stats.map((v) => {
+        await Promise.all(stats.map((v) => {
             avg += v.rating;
-        });
+        }));
         avg /= stats.length;
         await Doctor.findOneAndUpdate({ user: id }, {
             $push: { reviews: savedReview._id },
@@ -79,9 +79,9 @@ export const updateReviewCtrl = asyncHandler(async (req, res) => {
     // Recalculate and update doctor's total and average rating
     const stats = await Review.find({ doctor: id });
     let avg = 0;
-    stats.map((v) => {
+    await Promise.all(stats.map((v) => {
         avg += v.rating;
-    });
+    }));
     avg /= stats.length;
     await Doctor.findOneAndUpdate({ user: id }, {
         $push: { reviews: savedReview._id },
@@ -106,9 +106,9 @@ export const deleteReview = asyncHandler(async (req, res) => {
     // Recalculate and update doctor's total and average rating
     const stats = await Review.find({ doctor: id });
     let avg = 0;
-    stats.map((v) => {
+    await Promise.all(stats.map((v) => {
         avg += v.rating;
-    });
+    }));
     avg /= stats.length;
     await Doctor.findOneAndUpdate({ user: id }, {
         $push: { reviews: savedReview._id },
