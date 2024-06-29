@@ -13,6 +13,8 @@ import Report from "../models/report.js"; // Importing the Report model
 import Message from "../models/Message.js"; // Importing the Message model
 import Location from "../models/location.js"; // Importing the Location model
 import BeDoctor from "../models/BeDoctor.js";
+import cron from 'node-cron';
+
 
 // Controller to get all users with role 'patient'
 export const getAllUsersCtrl = asyncHandler(async (req, res) => {
@@ -213,40 +215,76 @@ export const createReport = asyncHandler(async (req, res) => {
 });
 
 // Controller to get all reports
-export const getAllReports = asyncHandler(async (req, res) => {
-    const reports = await Report.find();
-    let resp = [];
+const getResponseByKind = async (kind, id) => {
+    let response;
 
-    await Promise.all(reports.map(async (v) => {
-        let kind = v.kind;
-        let response;
-
-        if (kind === "user") {
-            response = await User.findById(v.about).select('-password -wishlist -ChatList -Reservations');
-        } else if (kind === "message") {
-            response = await Message.findById(v.about)
+    switch (kind) {
+        case "user":
+            response = await User.findById(id)
+                .select('-password -wishlist -ChatList -Reservations')
+            break;
+        case "message":
+            response = await Message.findById(id)
                 .populate({ path: 'senderId', select: '-password -wishlist -ChatList -Reservations' })
-                .populate({ path: 'receiverId', select: '-password -wishlist -ChatList -Reservations' });
-        } else if (kind === "history") {
-            response = await History.findById(v.about)
+                .populate({ path: 'receiverId', select: '-password -wishlist -ChatList -Reservations' })
+            break;
+        case "history":
+            response = await History.findById(id)
                 .populate({ path: 'user', select: '-password -wishlist -ChatList -Reservations' })
-                .populate({ path: 'doctor', select: '-password -wishlist -ChatList -Reservations' });
-        } else if (kind === "review") {
-            response = await Review.findById(v.about)
+            break;
+        case "review":
+            response = await Review.findById(id)
                 .populate({ path: 'user', select: '-password -wishlist -ChatList -Reservations' })
-                .populate({ path: 'doctor', select: '-password -wishlist -ChatList -Reservations' });
-        }
-
-        resp.push({ response, description: v.description });
-    }));
-    if (resp.length === 0) {
-        return res.status(404).json({ message: "no reports found" });
+            break;
+        default:
+            response = null;
     }
 
-    res.status(200).json({ data: resp });
-});
-export const deleteReport = asyncHandler(async (req, res) => {
-    await Report.findByIdAndDelete(req.params.reportId)
+    return response;
+};
 
+export const getAllReports = asyncHandler(async (req, res) => {
+    try {
+        const reports = await Report.find().sort({ createdAt: -1 });
+        let resp = [];
+
+        await Promise.all(reports.map(async (v) => {
+            const response = await getResponseByKind(v.kind, v.about);
+            if (response) {
+                resp.push({ response, description: v.description, kind: v.kind, createdAt: v.createdAt });
+            }
+        }));
+        resp = resp.sort((a, b) => b.createdAt - a.createdAt);
+
+        if (resp.length === 0) {
+            return res.status(404).json({ message: "No reports found" });
+        }
+
+        res.status(200).json({ data: resp });
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+});
+
+export const deleteReport = asyncHandler(async (req, res) => {
+    const report = await Report.findByIdAndDelete(req.params.reportId)
+    if (!report) {
+        return res.status(404).json({ message: "no report found" });
+    }
     res.status(200).json({ message: "report deleted" })
 })
+
+cron.schedule('0 0 * * *', async () => {
+    try {
+        // Calculate the date one week ago from now
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+        // Delete Report older than one week
+        const result = await Report.deleteMany({ createdAt: { $lt: oneWeekAgo } });
+
+        console.log(`Deleted ${result.deletedCount} outdated Report.`);
+    } catch (error) {
+        console.error('Error deleting outdated Report:', error);
+    }
+});
