@@ -45,7 +45,7 @@ router.post('/:id/booking/:locationId', validateObject, verifyToken, isBlock, ge
 router.post('/:id/booking', validateObject, verifyToken, isBlock, getCheckoutSessionHome);
 router.post('/booking-approve/:bookingId', verifyDoctor, isBlock, approvedBooking);
 router.post('/booking-cancel/:bookingId', verifyToken, isBlock, cancelledBooking);
-router.delete('/booking/:bookingId', verifyToken, isBlock, deleteBooking);
+router.delete('/booking/:bookingId', verifyTokenAndAdmin, isBlock, deleteBooking);
 router.get('/booking-doctor', verifyDoctor, isBlock, getBookingToDoctor);
 router.get('/booking-patient', verifyToken, isBlock, getBookingToPatient);
 
