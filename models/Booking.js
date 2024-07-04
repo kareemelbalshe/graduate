@@ -20,6 +20,7 @@ const BookingSchema = new Schema(
     toPerson: { type: String },
     complaining: { type: String },
     age:String,
+    gender: { type: String, enum: ["male", "female", "other"] },
     // Define the price of the booking ticket
     ticketPrice: { type: Number },
     // Define the status of the booking (pending, approved, cancelled)

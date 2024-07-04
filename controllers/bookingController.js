@@ -20,7 +20,8 @@ export const getCheckoutSessionClinic = asyncHandler(async (req, res) => {
             status: "pending",
             toPerson: req.body.toPerson,
             complaining: req.body.complaining,
-            age: req.body.age
+            age: req.body.age,
+            gender: req.body.gender
         })
         const timeSlot = req.body.timeSlots
         const clinic = await Location.findOne({ _id: req.params.locationId, userId: req.params.id })

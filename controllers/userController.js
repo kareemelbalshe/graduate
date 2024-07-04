@@ -170,7 +170,7 @@ export const UserBeDoctor = asyncHandler(async (req, res) => {
     // Generate authentication token
     const token = user.generateAuthToken();
     // Create doctor profile for the user
-    const doctor = await Doctor.create({ user: req.params.id });
+    const doctor = await Doctor.create({ user: req.params.id, specialization: req.body.specialization });
     // Respond with success message and user data
     res.status(200).json({
         photo: user.photo,
