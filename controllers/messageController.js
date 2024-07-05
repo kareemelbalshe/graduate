@@ -24,16 +24,10 @@ export const sendMessage = asyncHandler(async (req, res) => {
 			});
 
 			// Add receiverId to sender's ChatList and vice versa
-			await User.findByIdAndUpdate(senderId, {
-				$push: {
-					ChatList: conversation._id
-				}
-			});
-			await User.findByIdAndUpdate(receiverId, {
-				$push: {
-					ChatList: conversation._id
-				}
-			});
+			await Promise.all([
+				User.findByIdAndUpdate(senderId, { $push: { ChatList: conversation._id } }),
+				User.findByIdAndUpdate(receiverId, { $push: { ChatList: conversation._id } })
+			]);
 		}
 
 		// Create a new message instance
@@ -44,9 +38,7 @@ export const sendMessage = asyncHandler(async (req, res) => {
 		});
 
 		// Add message to conversation
-		if (newMessage) {
-			conversation.messages.push(newMessage._id);
-		}
+		conversation.messages.push(newMessage._id);
 
 		// Save conversation and message asynchronously
 		await Promise.all([conversation.save(), newMessage.save()]);
@@ -77,7 +69,7 @@ export const getMessages = asyncHandler(async (req, res) => {
 		}).populate("messages");
 
 		// If conversation doesn't exist, return empty array
-		if (!conversation) return res.status(200).json({messages:"no conversation found"});
+		if (!conversation) return res.status(200).json({ messages: "no conversation found" });
 
 		// Extract messages from conversation and fetch sender and receiver details
 		const messages = conversation.messages;
@@ -94,28 +86,46 @@ export const getMessages = asyncHandler(async (req, res) => {
 
 // Controller for deleting a message by its ID
 export const deleteMessage = asyncHandler(async (req, res) => {
-	// Find and delete message by its ID
-	await Message.findByIdAndDelete(req.params.messageId);
+	try {
+		// Find and delete message by its ID
+		await Message.findByIdAndDelete(req.params.messageId);
 
-	// Respond with success message
-	res.status(200).json({ message: "Message is deleted" });
+		// Respond with success message
+		res.status(200).json({ message: "Message is deleted" });
+	} catch (error) {
+		console.log("Error in deleteMessage controller: ", error.message);
+		res.status(500).json({ error: "Internal server error" });
+	}
 });
 
 // Controller for deleting a conversation between authenticated user and a specific user
 export const deleteConversation = asyncHandler(async (req, res) => {
-	const { id: userToChatId } = req.params;
-	const senderId = req.user.id;
-	const user = await User.findById(senderId);
-	const conversation = await Conversation.findOne({
-		participants: { $all: [senderId, userToChatId] },
-	});
-	user.ChatList.map(async (c) => {
-		// Find and delete conversation between sender and userToChatId
-		if (c.id === conversation.id) {
-			user.ChatList.splice(user.ChatList.indexOf(c), 1);
-		}
-	});
+	try {
+		const { id: userToChatId } = req.params;
+		const senderId = req.user.id;
 
-	// Respond with success message
-	res.status(200).json({ message: "Conversation is deleted" });
+		// Find the conversation between sender and userToChatId
+		const conversation = await Conversation.findOne({
+			participants: { $all: [senderId, userToChatId] },
+		});
+
+		if (!conversation) {
+			return res.status(404).json({ message: "Conversation not found" });
+		}
+
+		// Remove conversation from user's ChatList
+		await User.findByIdAndUpdate(senderId, { $pull: { ChatList: conversation._id } });
+
+		// Emit an event to notify the receiver about the conversation deletion
+		const receiverSocketId = getReceiverSocketId(userToChatId);
+		if (receiverSocketId) {
+			io.to(receiverSocketId).emit("conversationDeleted", { conversationId: conversation._id, deletedBy: senderId });
+		}
+
+		// Respond with success message
+		res.status(200).json({ message: "Conversation is deleted from your chat list" });
+	} catch (error) {
+		console.log("Error in deleteConversation controller: ", error.message);
+		res.status(500).json({ error: "Internal server error" });
+	}
 });
