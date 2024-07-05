@@ -48,7 +48,7 @@ export const sendResetPasswordCtrl = asyncHandler(async (req, res) => {
     // Send the email with the OTP
     await sendEmail(user.email, "Reset Password", htmlTemplate);
     // Respond with success message and user ID
-    res.status(200).json({ message: "OTP sent,Please check your email", userId: user._id });
+    res.status(200).json({ message: "OTP sent, Please check your email", userId: user._id });
 });
 
 // Controller for resetting password using OTP
@@ -61,7 +61,7 @@ export const resetPasswordCtrl = asyncHandler(async (req, res) => {
     // Find user by ID
     const user = await User.findById(req.params.userId);
     if (!user) {
-        return res.status(404).json({ message: "user not found" });
+        return res.status(404).json({ message: "User not found" });
     }
     // Find verification token for the user and match it with the OTP received
     const verificationToken = await VerificationTokenSchema.findOne({
@@ -69,7 +69,7 @@ export const resetPasswordCtrl = asyncHandler(async (req, res) => {
         token: req.body.code
     });
     if (!verificationToken) {
-        return res.status(400).json({ message: "invalid otp" });
+        return res.status(400).json({ message: "Invalid OTP" });
     }
     // If account is not verified, set it to verified
     if (!user.isAccountVerified) {
@@ -86,7 +86,7 @@ export const resetPasswordCtrl = asyncHandler(async (req, res) => {
         // Delete the verification token after password reset
         await verificationToken.deleteOne({ userId: req.params.userId });
     } else {
-        res.status(500).json({ message: "password and confirm not match" });
+        return res.status(400).json({ message: "Password and confirm password do not match" });
     }
     // Respond with success message
     res.status(200).json({ message: "Password reset successfully, please log in" });
