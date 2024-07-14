@@ -2,13 +2,17 @@
 import cron from 'node-cron';
 import Doctor from '../models/Doctor.js'
 import User from '../models/User.js'
-import Booking from '../models/Booking.js'
+import Booking, { validateBooking } from '../models/Booking.js'
 import asyncHandler from "express-async-handler"
-import Location from '../models/location.js'
+import Location from '../models/Location.js'
 
 // Endpoint to create a new booking
 export const getCheckoutSessionClinic = asyncHandler(async (req, res) => {
     try {
+        const { error } = validateBooking(req.body);
+        if (error) {
+            return res.status(400).json({ success: false, message: error.details[0].message });
+        }
         const doctor = await Doctor.findOne({ user: req.params.id })
         if (!doctor) {
             return res.status(404).json({ success: false, message: 'Doctor not found' })
@@ -61,6 +65,10 @@ export const getCheckoutSessionClinic = asyncHandler(async (req, res) => {
 
 export const getCheckoutSessionHome = asyncHandler(async (req, res) => {
     try {
+        const { error } = validateBooking(req.body);
+        if (error) {
+            return res.status(400).json({ success: false, message: error.details[0].message });
+        }
         const doctor = await Doctor.findOne({ user: req.params.id })
         if (!doctor) {
             return res.status(404).json({ success: false, message: 'Doctor not found' })

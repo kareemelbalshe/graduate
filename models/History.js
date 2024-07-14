@@ -1,8 +1,8 @@
 import { Schema, model } from 'mongoose';
+import Joi from 'joi';
 
 // Define the History schema
 const History = new Schema({
-    // Description of the medical history
     description: {
         type: String,
         required: true,
@@ -10,29 +10,24 @@ const History = new Schema({
         minlength: 10,
         maxlength: 200,
     },
-    // Reference to the user associated with the history
     user: {
         type: Schema.Types.ObjectId,
-        ref: "User", // Reference to the User model
+        ref: "User",
         required: true,
     },
-    // Reference to the doctor associated with the history
     doctor: {
         type: Schema.Types.ObjectId,
-        ref: "User", // Reference to the User model
-        default: "Not at app", // Default value if not specified
+        ref: "User",
+        default: null,
     },
-    // Date of the medical history
     date: {
         type: Date,
     },
-    // Category of the medical history
     category: {
         type: String,
         required: true,
-        enum: ["t7alel", "rojeta", "ashe3a"], // Allowed values
+        enum: ["t7alel", "rojeta", "ashe3a"],
     },
-    // Image associated with the medical history
     image: {
         type: Object,
         default: {
@@ -40,14 +35,27 @@ const History = new Schema({
             publicId: null,
         }
     },
+    status: {
+        type: String,
+        enum: ["pending", "approved", "rejected"],
+        default: "pending"
+    },
 }, {
-    // Enable timestamps to automatically add createdAt and updatedAt fields
     timestamps: true,
-    // Configure JSON serialization to include virtual properties
     toJSON: { virtuals: true },
-    // Configure object serialization to include virtual properties
     toObject: { virtuals: true }
 });
+
+
+// Validation function using Joi
+export const validateHistory = function (obj) {
+    const schema = Joi.object({
+        description: Joi.string().trim().min(10).max(200).required(),
+        date: Joi.date().optional(),
+        category: Joi.string().valid("t7alel", "rojeta", "ashe3a").required(),
+    });
+    return schema.validate(obj);
+};
 
 // Create a Mongoose model based on the History schema
 export default model('History', History);

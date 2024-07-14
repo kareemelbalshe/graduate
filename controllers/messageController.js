@@ -1,5 +1,5 @@
 import Conversation from "../models/Conversation.js";
-import Message from "../models/Message.js";
+import Message, { validateMessage } from "../models/Message.js";
 import { getReceiverSocketId, io } from "../middlewares/socket.js"; // Importing socket-related functions
 import User from "../models/User.js"; // Importing the User model
 import asyncHandler from "express-async-handler"; // Importing asyncHandler middleware for handling asynchronous functions
@@ -8,6 +8,10 @@ import asyncHandler from "express-async-handler"; // Importing asyncHandler midd
 // Controller for sending a message
 export const sendMessage = asyncHandler(async (req, res) => {
 	try {
+		const { error } = validateMessage(req.body);
+		if (error) {
+			return res.status(400).json({ message: error.details[0].message });
+		}
 		const { message } = req.body;
 		const { id: receiverId } = req.params; // Extracting receiverId from request parameters
 		const senderId = req.user.id; // Extracting senderId from authenticated user
@@ -87,6 +91,10 @@ export const getMessages = asyncHandler(async (req, res) => {
 // Controller for deleting a message by its ID
 export const deleteMessage = asyncHandler(async (req, res) => {
 	try {
+		const message = await Message.findById(req.params.messageId);
+		if (message.senderId.toString() !== req.user.id) {
+			return res.status(403).json({ message: "You are not authorized to delete this message" });
+		}
 		// Find and delete message by its ID
 		await Message.findByIdAndDelete(req.params.messageId);
 

@@ -95,7 +95,12 @@ export const validateRegisterUser = function (obj) {
     const schema = Joi.object({
         username: Joi.string().trim().min(2).max(100).required(),
         email: Joi.string().trim().min(5).max(100).required().email(),
-        password: passwordComplexity().required()
+        password: passwordComplexity().required(),
+        phone: Joi.string().optional(),
+        birthday: Joi.date().optional(),
+        address: Joi.string().optional(),
+        gender: Joi.string().valid("male", "female", "other").optional(),
+        bloodType: Joi.string().optional(),
     });
     return schema.validate(obj);
 };
@@ -111,7 +116,13 @@ export const validateLoginUser = function (obj) {
 export const validateUpdateUser = function (obj) {
     const schema = Joi.object({
         username: Joi.string().trim().min(2).max(100),
-        password: passwordComplexity(),
+        email: Joi.string().trim().min(5).max(100).email().optional(),
+        password: passwordComplexity().optional(),
+        phone: Joi.string().optional(),
+        birthday: Joi.date().optional(),
+        address: Joi.string().optional(),
+        gender: Joi.string().valid("male", "female", "other").optional(),
+        bloodType: Joi.string().optional(),
     });
     return schema.validate(obj);
 };

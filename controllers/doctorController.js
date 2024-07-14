@@ -1,7 +1,7 @@
 // Copy right for Kareem Elbalshy kareemelbalshe1234@gmail.com
 
 import Conversation from "../models/Conversation.js";
-import Doctor from "../models/Doctor.js";
+import Doctor, { validateDoctor } from "../models/Doctor.js";
 import User from "../models/User.js";
 import asyncHandler from "express-async-handler";
 
@@ -20,6 +20,11 @@ export const getAllDoctors = asyncHandler(async (req, res) => {
 
 // Endpoint to update doctor information
 export const updateDoctor = asyncHandler(async (req, res) => {
+    const { error } = validateDoctor(req.body);
+    if (error) {
+        return res.status(400).json({ message: error.details[0].message });
+    }
+
     await Doctor.findOneAndUpdate({ user: req.params.id }, {
         $set: {
             specialization: req.body.specialization,

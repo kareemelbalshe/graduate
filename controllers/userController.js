@@ -1,18 +1,18 @@
 import asyncHandler from "express-async-handler"; // Importing asyncHandler middleware
-import User from "../models/User.js"; // Importing the User model
+import User, { validateUpdateUser } from "../models/User.js"; // Importing the User model
 import bcrypt from 'bcryptjs'; // Importing bcrypt for password hashing
 import path from 'path'; // Importing path module for file paths
 import { fileURLToPath } from 'url'; // Importing fileURLToPath function
 const __dirname = path.dirname(fileURLToPath(import.meta.url)); // Getting current directory name
 import fs from "fs"; // Importing fs module for file system operations
 import { cloudinaryRemoveImage, cloudinaryRemoveMultipleImage, cloudinaryUploadImage } from "../utils/cloudinary.js"; // Importing cloudinary functions
-import Doctor from "../models/Doctor.js"; // Importing the Doctor model
+import Doctor, { validateDoctor } from "../models/Doctor.js"; // Importing the Doctor model
 import Review from "../models/Review.js"; // Importing the Review model
 import History from "../models/History.js"; // Importing the History model
-import Report from "../models/report.js"; // Importing the Report model
+import Report, { validateReport } from "../models/Report.js"; // Importing the Report model
 import Message from "../models/Message.js"; // Importing the Message model
-import Location from "../models/location.js"; // Importing the Location model
-import BeDoctor from "../models/BeDoctor.js";
+import Location from "../models/Location.js"; // Importing the Location model
+import BeDoctor, { validateBeDoctor } from "../models/BeDoctor.js";
 import cron from 'node-cron';
 
 
@@ -36,6 +36,10 @@ export const getUserProfileCtrl = asyncHandler(async (req, res) => {
 
 // Controller to update user profile by ID
 export const updateUserProfileCtrl = asyncHandler(async (req, res) => {
+    const { error } = validateUpdateUser(req.body);
+    if (error) {
+        return res.status(400).json({ message: error.details[0].message });
+    }
     // Hash password if provided
     if (req.body.password) {
         const salt = await bcrypt.genSalt(10);
@@ -116,6 +120,10 @@ export const deleteUserProfileCtrl = asyncHandler(async (req, res) => {
 });
 
 export const askToBeDoctor = asyncHandler(async (req, res) => {
+    const { error } = validateBeDoctor(req.body);
+    if (error) {
+        return res.status(400).json({ message: error.details[0].message });
+    }
     // Find user by ID
     let user = await User.findById(req.user.id);
     if (user.role === "doctor") {
@@ -140,6 +148,10 @@ export const getApplications = asyncHandler(async (req, res) => {
 
 // Controller to convert user to doctor
 export const UserBeDoctor = asyncHandler(async (req, res) => {
+    const { error } = validateDoctor(req.body);
+    if (error) {
+        return res.status(400).json({ message: error.details[0].message });
+    }
     // Find user by ID
     let user = await User.findById(req.params.id);
     if (user.role === "doctor") {
@@ -203,6 +215,10 @@ export const makeBlock = asyncHandler(async (req, res) => {
 
 // Controller to create a report
 export const createReport = asyncHandler(async (req, res) => {
+    const { error } = validateReport(req.body);
+    if (error) {
+        return res.status(400).json({ message: error.details[0].message });
+    }
     // Create a report
     const report = await Report.create({
         user: req.user.id,

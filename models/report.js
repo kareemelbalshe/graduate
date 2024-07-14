@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose';
+import Joi from 'joi';
 
 // Define the Report schema
 const Report = new Schema({
@@ -35,6 +36,14 @@ const Report = new Schema({
     // Configure object serialization to include virtual properties
     toObject: { virtuals: true }
 });
+
+// Validation function using Joi
+export const validateReport = function (obj) {
+    const schema = Joi.object({
+        description: Joi.string().trim().min(10).max(200).required(),
+    });
+    return schema.validate(obj);
+};
 
 // Create a Mongoose model based on the Report schema
 export default model('Report', Report);

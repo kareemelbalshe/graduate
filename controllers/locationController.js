@@ -1,11 +1,15 @@
 import asyncHandler from "express-async-handler";
-import Location from "../models/location.js";
+import Location, { validateLocation } from "../models/Location.js";
 import Doctor from "../models/Doctor.js";
 import Booking from "../models/Booking.js";
 import cron from 'node-cron';
 
 // Controller for creating a new location
 export const createLocation = asyncHandler(async (req, res) => {
+    const { error } = validateLocation(req.body);
+    if (error) {
+        return res.status(400).json({ message: error.details[0].message });
+    }
     const { latitude, longitude, address } = req.body;
 
     // Create a new location instance
@@ -34,6 +38,9 @@ export const updateLocation = asyncHandler(async (req, res) => {
         { address: req.body.address, latitude: req.body.latitude, longitude: req.body.longitude },
         { new: true } // Return the updated document
     );
+    if (req.user.role!=="doctor" || req.user.id !== location.user.toString()){
+        return res.status(403).json({ message: "You are not authorized to update this location" });
+    }
 
     if (!location) {
         return res.status(404).json({ message: "Location not found" });
@@ -134,6 +141,10 @@ export const setTimeSlot = asyncHandler(async (req, res) => {
 export const updateTimeSlot = asyncHandler(async (req, res) => {
     const location = await Location.findById(req.params.locationId);
 
+    if (location.user.toString() !== req.user.id) {
+        return res.status(403).json({ message: "You are not authorized to update this location" });
+    }
+
     if (!location) {
         return res.status(404).json({ message: "Location not found" });
     }
@@ -164,6 +175,9 @@ export const updateTimeSlot = asyncHandler(async (req, res) => {
 // Controller for deleting a time entry
 export const deleteTime = asyncHandler(async (req, res) => {
     const location = await Location.findById(req.params.locationId);
+    if (location.user.toString() !== req.user.id) {
+        return res.status(403).json({ message: "You are not authorized to update this location" });
+    }
 
     if (!location) {
         return res.status(404).json({ message: "Location not found" });
@@ -183,6 +197,10 @@ export const deleteTime = asyncHandler(async (req, res) => {
 // Controller for deleting a time slot
 export const deleteTimeSlot = asyncHandler(async (req, res) => {
     const location = await Location.findById(req.params.locationId);
+
+    if (location.user.toString() !== req.user.id) {
+        return res.status(403).json({ message: "You are not authorized to update this location" });
+    }
 
     if (!location) {
         return res.status(404).json({ message: "Location not found" });
@@ -226,6 +244,14 @@ export const getLocations = asyncHandler(async (req, res) => {
 export const deleteLocation = asyncHandler(async (req, res) => {
     const id = req.params.locationId;
 
+    const location = await Location.findById(id);
+    if (location.user.toString() !== req.user.id||req.user.role!=="admin") {
+        return res.status(404).json({ message: "You are not authorized to delete this location" });
+    }
+
+    if (!location) {
+        return res.status(404).json({ message: "Location not found" });
+    }
     // Find the location by its ID and delete it
     await Location.findByIdAndDelete(id);
 

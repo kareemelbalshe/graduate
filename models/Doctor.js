@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose';
+import Joi from 'joi';
 
 // Define the Doctor schema
 const Doctor = new Schema({
@@ -38,12 +39,12 @@ const Doctor = new Schema({
             "Pathologist",
             "PlasticSurgeon",
             "CardiothoracicSurgeon",
-        ]
+        ],
     },
     // Degree of the doctor
     degree: {
         type: String,
-        enum: ["Intern", "Resident", "Specialist", "SeniorSpecialist", "Consultant", "SeniorConsultant", "Professor"]
+        enum: ["Intern", "Resident", "Specialist", "SeniorSpecialist", "Consultant", "SeniorConsultant", "Professor"],
     },
     // Price of the doctor's consultation ticket
     ticketPriceClinic: { type: Number },
@@ -83,6 +84,54 @@ const Doctor = new Schema({
     // Configure object serialization to include virtual properties
     toObject: { virtuals: true }
 });
+
+// Validation function using Joi
+export const validateDoctor = function (obj) {
+    const schema = Joi.object({
+        specialization: Joi.string().valid(
+            "General",
+            "Cardiologist",
+            "Neurologist",
+            "Oncologist",
+            "Pediatrician",
+            "Dermatologist",
+            "Gastroenterologist",
+            "OrthopedicSurgeon",
+            "OB-GYN",
+            "Psychiatrist",
+            "Endocrinologist",
+            "Pulmonologist",
+            "Urologist",
+            "Ophthalmologist",
+            "Radiologist",
+            "Anesthesiologist",
+            "ENT",
+            "Rheumatologist",
+            "Nephrologist",
+            "InfectiousDisease",
+            "Allergist",
+            "Hematologist",
+            "Pathologist",
+            "PlasticSurgeon",
+            "CardiothoracicSurgeon"
+        ),
+        degree: Joi.string().valid(
+            "Intern",
+            "Resident",
+            "Specialist",
+            "SeniorSpecialist",
+            "Consultant",
+            "SeniorConsultant",
+            "Professor"
+        ),
+        ticketPriceClinic: Joi.number(),
+        ticketPriceHome: Joi.number(),
+        hospital: Joi.string().optional(),
+        experiences: Joi.string().optional(),
+        bio: Joi.string().max(200).optional(),
+    });
+    return schema.validate(obj);
+};
 
 // Create a Mongoose model based on the Doctor schema
 export default model("Doctor", Doctor);

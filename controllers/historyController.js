@@ -1,15 +1,22 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
-import History from '../models/History.js';
+import History, { validateHistory } from '../models/History.js';
 import { cloudinaryRemoveImage, cloudinaryUploadImage } from '../utils/cloudinary.js';
 import asyncHandler from 'express-async-handler';
 import User from '../models/User.js';
+import cron from 'node-cron';
+import { io } from '../middlewares/socket.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+
 // Controller function to create a new history entry
 export const createHistory = asyncHandler(async (req, res) => {
+    const { error } = validateHistory(req.body);
+    if (error) {
+        return res.status(400).json({ message: error.details[0].message });
+    }
     // Find the doctor who is creating the history entry
     const doctor = await User.findOne({ _id: req.user.id, role: "doctor" });
 
@@ -36,11 +43,63 @@ export const createHistory = asyncHandler(async (req, res) => {
         }
     });
 
+    await Notification.create({
+        user: req.params.id,
+        type: 'history_request',
+        message: 'A new medical history has been added by your doctor. Please approve or reject it.',
+        history: history._id
+    });
+
+    io.to(history.user.toString()).emit('historyAdded', {
+        message: 'A new medical history has been added. Approval or rejection.',
+        historyId: history._id
+    });
+
     // Send the newly created history entry as a response
     res.status(201).json(history);
 
     // Delete the temporarily saved image from the server
     fs.unlinkSync(imagePath);
+});
+
+// Controller function to approve a history entry
+export const approveHistory = asyncHandler(async (req, res) => {
+    try {
+        const { response } = req.body;
+        const history = await History.findById(req.params.id);
+
+        if (!history) return res.status(404).json({ error: 'History not found' });
+
+        history.status = response === 'accepted' ? 'approved' : 'rejected';
+        await history.save();
+
+        res.status(200).json(history);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+})
+
+cron.schedule('0 0 * * *', async () => {
+    try {
+        // Calculate the date one week ago from now
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+        // Delete bookings older than one week
+        const result = await Notification.deleteMany({ createdAt: { $lt: oneWeekAgo } });
+        const result2 = await History.deleteMany({
+            createdAt: { $lt: oneWeekAgo },
+            $or: [
+                { status: 'pending' },
+                { status: 'rejected' }
+            ]
+        });
+
+        console.log(`Deleted ${result.deletedCount} outdated notifications.`);
+        console.log(`Deleted ${result2.deletedCount} outdated history entries.`);
+    } catch (error) {
+        console.error('Error deleting outdated:', error);
+    }
 });
 
 // Controller function to get all history entries
@@ -74,7 +133,7 @@ export const getAllHistory = asyncHandler(async (req, res) => {
 // Controller function to get history entries of a specific user
 export const getUserHistory = asyncHandler(async (req, res) => {
     // Find history entries associated with the current user
-    const history = await History.find({ user: req.user.id })
+    const history = await History.find({ user: req.user.id, status: 'approved' })
         .populate("doctor", "-likes -reviews -booking")
         .sort({ createdAt: -1 });
 
@@ -127,6 +186,10 @@ export const deleteHistory = asyncHandler(async (req, res) => {
 
 // Controller function to update a history entry by its ID
 export const updateHistory = asyncHandler(async (req, res) => {
+    const { error } = validateHistory(req.body);
+    if (error) {
+        return res.status(400).json({ message: error.details[0].message });
+    }
     // Find the history entry to update
     const history = await History.findById(req.params.historyId);
 

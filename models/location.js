@@ -1,4 +1,5 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
+import Joi from 'joi';
 
 // Define the Location schema
 const LocationSchema = new mongoose.Schema({
@@ -37,6 +38,16 @@ const LocationSchema = new mongoose.Schema({
   // Configure object serialization to include virtual properties
   toObject: { virtuals: true }
 });
+
+// Validation function using Joi
+export const validateLocation = function (obj) {
+  const schema = Joi.object({
+    latitude: Joi.number().optional(),
+    longitude: Joi.number().optional(),
+    address: Joi.string().required(),
+  });
+  return schema.validate(obj);
+};
 
 // Create a Mongoose model based on the Location schema
 const Location = mongoose.model('Location', LocationSchema);

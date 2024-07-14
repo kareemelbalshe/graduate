@@ -1,4 +1,5 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
+import Joi from 'joi';
 
 // Define the message schema
 const messageSchema = new mongoose.Schema(
@@ -19,8 +20,8 @@ const messageSchema = new mongoose.Schema(
 		message: {
 			type: String,
 			required: true,
+			trim: true,
 		},
-		// createdAt and updatedAt timestamps
 	},
 	{
 		// Enable timestamps to automatically add createdAt and updatedAt fields
@@ -32,7 +33,15 @@ const messageSchema = new mongoose.Schema(
 	}
 );
 
+// Validation function using Joi
+export const validateMessage = function (obj) {
+	const schema = Joi.object({
+		message: Joi.string().trim().required(),
+	});
+	return schema.validate(obj);
+};
+
 // Create a Mongoose model based on the message schema
-const Message = mongoose.model("Message", messageSchema);
+const Message = mongoose.model('Message', messageSchema);
 
 export default Message;

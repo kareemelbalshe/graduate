@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose';
+import Joi from 'joi';
 
 // Define a Mongoose schema for the Booking model
 const BookingSchema = new Schema(
@@ -19,7 +20,7 @@ const BookingSchema = new Schema(
     clinic: { type: Schema.Types.ObjectId, ref: "Location" },
     toPerson: { type: String },
     complaining: { type: String },
-    age:String,
+    age: { type: String },
     gender: { type: String, enum: ["male", "female", "other"] },
     // Define the price of the booking ticket
     ticketPrice: { type: Number },
@@ -50,6 +51,19 @@ const BookingSchema = new Schema(
     toObject: { virtuals: true }
   }
 );
+
+// Validation function using Joi
+export const validateBooking = function (obj) {
+  const schema = Joi.object({
+    kind: Joi.string().valid("home", "clinic").required(),
+    toPerson: Joi.string().optional(),
+    complaining: Joi.string().optional(),
+    age: Joi.string().optional(),
+    gender: Joi.string().valid("male", "female", "other").optional(),
+    cancelReason: Joi.string().optional()
+  });
+  return schema.validate(obj);
+};
 
 // Create a Mongoose model based on the Booking schema
 export default model("Booking", BookingSchema);

@@ -5,7 +5,7 @@ import validateObject from "../middlewares/validateObject.js";
 import { photoUpload } from "../middlewares/photoUpload.js";
 import { isBlock } from "../middlewares/isBlock.js";
 import { getChatList, getAllDoctors, getLikeList, getWishList, toggleLikeCtrl, updateDoctor, popularDoctor, newDoctor, getDoctor, searchAboutPatient, searchAboutDoctor } from "../controllers/doctorController.js";
-import { createHistory, deleteHistory, getAllHistory, getSingleHistory, getUserHistory, updateHistory, updateHistoryPhoto } from "../controllers/historyController.js";
+import { approveHistory, createHistory, deleteHistory, getAllHistory, getSingleHistory, getUserHistory, updateHistory, updateHistoryPhoto } from "../controllers/historyController.js";
 import { approvedBooking, cancelledBooking, deleteBooking, getAllBooking, getBookingToDoctor, getBookingToPatient, getCheckoutSessionClinic, getCheckoutSessionHome } from "../controllers/bookingController.js";
 import { createReview, deleteReview, getAllReviews, getDoctorReviews, updateReviewCtrl } from "../controllers/reviewController.js";
 import { createLocation, deleteLocation, deleteTime, deleteTimeSlot, getAllLocations, getLocation, getLocations, setTime, setTimeSlot, updateLocation, updateTimeSlot } from "../controllers/locationController.js";
@@ -90,7 +90,8 @@ router.route("/profile/:id/history")
 router.route("/profile/history/:historyId")
     .get(verifyToken, isBlock, getSingleHistory)
     .delete(verifyToken, isBlock, deleteHistory)
-    .post(verifyDoctor, isBlock, updateHistory);
+    .post(verifyDoctor, isBlock, updateHistory)
+    .put(verifyDoctor, isBlock, approveHistory);
 router.route("/profile/history/update-image/:historyId")
     .put(verifyToken, isBlock, photoUpload.single("image"), updateHistoryPhoto);
 

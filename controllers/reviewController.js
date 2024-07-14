@@ -1,5 +1,5 @@
 import Doctor from "../models/Doctor.js"; // Importing the Doctor model
-import Review from "../models/Review.js"; // Importing the Review model
+import Review, { validateReview } from "../models/Review.js"; // Importing the Review model
 import asyncHandler from "express-async-handler"; // Importing asyncHandler middleware
 
 // Controller to get all reviews
@@ -28,6 +28,10 @@ export const getDoctorReviews = asyncHandler(async (req, res) => {
 // Controller to create a new review
 export const createReview = asyncHandler(async (req, res) => {
     try {
+        const { error } = validateReview(req.body);
+        if (error) {
+            return res.status(400).json({ success: false, message: error.details[0].message });
+        }
         const id = req.params.id;
         // Check if the user has already reviewed the doctor
         const existingReview = await Review.findOne({ doctor: id, user: req.user.id });
@@ -73,6 +77,10 @@ export const createReview = asyncHandler(async (req, res) => {
 // Controller to update a review
 export const updateReviewCtrl = asyncHandler(async (req, res) => {
     try {
+        const { error } = validateReview(req.body);
+        if (error) {
+            return res.status(400).json({ success: false, message: error.details[0].message });
+        }
         const doctorId = req.params.id;
         const reviewId = req.params.reviewId;
 
@@ -80,6 +88,10 @@ export const updateReviewCtrl = asyncHandler(async (req, res) => {
         const review = await Review.findById(reviewId);
         if (!review) {
             return res.status(404).json({ message: "Review not found" });
+        }
+
+        if (review.user.toString() !== req.user.id) {
+            return res.status(400).json({ message: "You are not authorized to update this review" });
         }
 
         // Check if the review belongs to the doctor
