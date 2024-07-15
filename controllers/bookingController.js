@@ -4,7 +4,7 @@ import Doctor from '../models/Doctor.js'
 import User from '../models/User.js'
 import Booking, { validateBooking } from '../models/Booking.js'
 import asyncHandler from "express-async-handler"
-import Location from '../models/Location.js'
+import Location from '../models/location.js'
 
 // Endpoint to create a new booking
 export const getCheckoutSessionClinic = asyncHandler(async (req, res) => {

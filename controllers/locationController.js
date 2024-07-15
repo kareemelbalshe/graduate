@@ -1,5 +1,5 @@
 import asyncHandler from "express-async-handler";
-import Location, { validateLocation } from "../models/Location.js";
+import Location, { validateLocation } from "../models/location.js";
 import Doctor from "../models/Doctor.js";
 import Booking from "../models/Booking.js";
 import cron from 'node-cron';

@@ -11,7 +11,7 @@ import Review from "../models/Review.js"; // Importing the Review model
 import History from "../models/History.js"; // Importing the History model
 import Report, { validateReport } from "../models/report.js"; // Importing the Report model
 import Message from "../models/Message.js"; // Importing the Message model
-import Location from "../models/Location.js"; // Importing the Location model
+import Location from "../models/location.js"; // Importing the Location model
 import BeDoctor, { validateBeDoctor } from "../models/BeDoctor.js";
 import cron from 'node-cron';
 
