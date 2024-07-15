@@ -9,7 +9,7 @@ import { cloudinaryRemoveImage, cloudinaryRemoveMultipleImage, cloudinaryUploadI
 import Doctor, { validateDoctor } from "../models/Doctor.js"; // Importing the Doctor model
 import Review from "../models/Review.js"; // Importing the Review model
 import History from "../models/History.js"; // Importing the History model
-import Report, { validateReport } from "../models/Report.js"; // Importing the Report model
+import Report, { validateReport } from "../models/report.js"; // Importing the Report model
 import Message from "../models/Message.js"; // Importing the Message model
 import Location from "../models/Location.js"; // Importing the Location model
 import BeDoctor, { validateBeDoctor } from "../models/BeDoctor.js";
