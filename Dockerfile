@@ -10,4 +10,4 @@ COPY . .
 
 EXPOSE 3033
 
-CMD ["npm", "run", "start"]
+ENTRYPOINT ["npm", "run", "start"]
