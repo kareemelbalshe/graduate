@@ -12,12 +12,13 @@ import xss from 'xss-clean';
 import hpp from "hpp";
 import helmet from "helmet";
 import bodyParser from 'body-parser';
+import { initRedisClient } from "./middlewares/redis.js";
 
 dotenv.config();
 
 // Copy right for Kareem Elbalshy kareemelbalshe1234@gmail.com
 
-//https://graduate-wgus.onrender.com
+// https://graduate-wgus.onrender.com
 
 // Initialize express app
 app.use(express.json());
@@ -50,8 +51,22 @@ app.use("/api/password", passwordRoute);
 app.use(notFound);
 app.use(errorHandler);
 
+const initRedis = async () => {
+    try {
+        await connectDB();
+        await initRedisClient();
+        console.log('Redis client connected successfully');
+    } catch (error) {
+        console.error('Failed to connect to Redis:', error);
+    }
+};
+
 // Start the server and connect to the database
-server.listen(process.env.PORT, () => {
-    connectDB();
-    console.log(`Server started at http://localhost:${process.env.PORT}`);
+initRedis().then(() => {
+    server.listen(process.env.PORT, () => {
+        console.log(`Server started at http://localhost:${process.env.PORT}`);
+    });
+}).catch((error) => {
+    console.error('Failed to start server:', error);
+    process.exit(1); // Exit process with failure
 });

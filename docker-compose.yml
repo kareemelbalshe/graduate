@@ -1,5 +1,3 @@
-version: '3.8'
-
 name: doc_on_call
 #kareemelbalshy
 services:
@@ -13,3 +11,11 @@ services:
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
+    depends_on:
+      - redis  # تأكد من أن خدمة التطبيق تعتمد على Redis
+
+  redis:
+    container_name: doc_redis
+    image: "redis/redis-stack:latest"
+    ports:
+      - "6379:6379"
