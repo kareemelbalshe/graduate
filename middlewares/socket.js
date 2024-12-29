@@ -5,9 +5,7 @@ import express from "express";
 const app = express(); // Initialize Express app
 
 const server = http.createServer(app); // Create HTTP server
-const io = new Server(server, {
-    cors: {} // Enable CORS with default settings
-});
+const io = new Server(server);
 
 const userSocketMap = {}; // Map to store user IDs and their corresponding socket IDs
 

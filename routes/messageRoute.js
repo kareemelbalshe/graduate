@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { deleteConversation, deleteMessage, getMessages, sendMessage } from "../controllers/messageController.js";
+import { deleteConversation, deleteMessage, get_chatbot, getMessages, sendMessage } from "../controllers/messageController.js";
 import validateObject from "../middlewares/validateObject.js";
 import { verifyToken, verifyTokenAndOnlyUser } from "../middlewares/verifyToken.js";
 import { isBlock } from "../middlewares/isBlock.js";
@@ -23,6 +23,8 @@ router.delete("/:messageId", verifyTokenAndOnlyUser, isBlock, deleteMessage);
 // Route to send a message
 // Copy right for Kareem Elbalshy kareemelbalshe1234@gmail.com
 router.post("/send/:id", validateObject, verifyToken, isBlock, sendMessage);
+
+router.post("/chatbot", verifyToken, get_chatbot);
 
 const FLASK_API_URL = 'https://chat-bot-0fy8.onrender.com'||'http://127.0.0.1:5000'; // Update this path based on the actual path of the Flask application
 

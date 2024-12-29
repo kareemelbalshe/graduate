@@ -3,6 +3,7 @@ import Message, { validateMessage } from "../models/Message.js";
 import { getReceiverSocketId, io } from "../middlewares/socket.js"; // Importing socket-related functions
 import User from "../models/User.js"; // Importing the User model
 import asyncHandler from "express-async-handler"; // Importing asyncHandler middleware for handling asynchronous functions
+import ChatBot from "../models/ChatBot.js";
 
 
 // Controller for sending a message
@@ -135,5 +136,14 @@ export const deleteConversation = asyncHandler(async (req, res) => {
 	} catch (error) {
 		console.log("Error in deleteConversation controller: ", error.message);
 		res.status(500).json({ error: "Internal server error" });
+	}
+});
+
+export const get_chatbot = asyncHandler(async (req, res) => {
+	try {
+		const chatbot = await ChatBot.findOne({ user: req.user.id });
+		res.json(chatbot);
+	} catch (error) {
+		res.status(500).send(error.toString());
 	}
 });
